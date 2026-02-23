@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+* {
+  transition: background-color 0.3s ease,
+              color 0.3s ease,
+             border-color 0.3s ease;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+:root {
+  --bg-primary: #E1DFEA;
+  --bg-secondary: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --primary: #14B8A6;
+  --primary-dark: #0F766E;
+  --accent: #06B6D4;
+  --border: #E2E8F0;
+  --focus-ring: #2563EB;
+
+  --text-on-primary: #0F172A; 
+}
+
+.dark {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --text-primary: #F1F5F9;
+  --text-secondary: #CBD5E1;
+  --primary: #14B8A6;
+  --primary-dark: #0F766E;
+  --accent: #22D3EE;
+  --border: #334155;
+  --focus-ring: #2563EB;
+
+  --text-on-primary: #F1F5F9; 
+}
+
+.high-contrast {
+  --bg-primary: #000000;
+  --bg-secondary: #000000;
+  /* Text primary ko pure white rakhein taake black par chamke */
+  --text-primary: #FFFFFF; 
+  --text-secondary: #FFFF00; /* Secondary text ko yellow  focus ke liye */
+  --primary: #FFFF00; /* Bright Yellow */
+  --primary-dark: #FFD700;
+  --accent: #00FFFF;
+  --border: #FFFFFF;
+  --focus-ring: #00FFFF; 
+  
+  /* Yellow background par hamesha black text hona chahiye */
+  --text-on-primary: #000000; 
+}
+
