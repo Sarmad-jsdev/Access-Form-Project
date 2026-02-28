@@ -1,72 +1,34 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { User, Mail, Lock, ShieldCheck, ArrowRight } from "lucide-react";
+import { User, Mail, Lock, ShieldCheck, ArrowRight, ChevronDown } from "lucide-react";
+import axios from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
 
-  const [role, setRole] = useState("respondent");
-
-  {/* Form data state */}
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
+    role: "respondent",
     password: "",
     confirmPassword: "",
   });
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
-    // ✅ Empty fields check
-    if (
-      !formData.username ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
-      alert("Please fill all fields!");
-      return;
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/register", formData);
+      alert(res.data.message);
+      navigate("/login");
+    } catch (err) {
+      alert(err.response?.data?.message || "Registration failed");
     }
-
-    // ✅ Password match check
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
-
-    const existingUsers =
-      JSON.parse(localStorage.getItem("users")) || [];
-
-    // ✅ Duplicate email check
-    const emailExists = existingUsers.find(
-      (user) => user.email === formData.email
-    );
-
-    if (emailExists) {
-      alert("Email already registered!");
-      return;
-    }
-
-    const newUser = {
-      username: formData.username,
-      email: formData.email,
-      password: formData.password,
-      role: role,
-    };
-
-    localStorage.setItem(
-      "users",
-      JSON.stringify([...existingUsers, newUser])
-    );
-
-    alert(`Registered as ${role}! Please login.`);
-    navigate("/login");
   };
 
   return (
     <div className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center px-4 py-12">
-      <div className="max-w-xl w-full bg-[var(--bg-primary)] rounded-2xl shadow-2xl border border-[var(--border-color)] overflow-hidden flex flex-col md:flex-row">
+      <div className="max-w-xl w-full bg-[var(--bg-primary)] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col md:flex-row">
 
         {/* Left Info Section */}
         <div className="md:w-2/5 bg-[var(--primary)] p-8 text-[var(--text-on-primary)] flex flex-col justify-center">
@@ -86,19 +48,23 @@ const Register = () => {
 
             {/* Full Name */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold uppercase">
+              <label className="text-xs font-bold uppercase text-[var(--text-primary)]">
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)]" />
                 <input
                   type="text"
                   required
-                  value={formData.username}
-                  onChange={(e) =>
-                    setFormData({ ...formData, username: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg"
+                  value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg 
+                  border border-[var(--border)] 
+                  bg-[var(--bg-primary)] 
+                  text-[var(--text-primary)]
+                  placeholder-[color:var(--text-primary)]
+                  focus:ring-2 focus:ring-[var(--focus-ring)] 
+                  outline transition appearance-none"
                   placeholder="John Doe"
                 />
               </div>
@@ -106,19 +72,23 @@ const Register = () => {
 
             {/* Email */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold uppercase">
+              <label className="text-xs font-bold uppercase text-[var(--text-primary)]">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)]" />
                 <input
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg"
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg 
+                  border border-[var(--border)] 
+                  bg-[var(--bg-primary)] 
+                  text-[var(--text-primary)]
+                  placeholder-[color:var(--text-primary)]
+                  focus:ring-2 focus:ring-[var(--focus-ring)] 
+                  outline transition appearance-none"
                   placeholder="example@mail.com"
                 />
               </div>
@@ -126,35 +96,48 @@ const Register = () => {
 
             {/* Role */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold uppercase">
+              <label className="text-xs font-bold uppercase text-[var(--text-primary)]">
                 Select Role
               </label>
+              <div className="relative">
+              <ChevronDown  className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)]"/>
               <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full p-2.5 border rounded-lg"
+                value={formData.role}
+        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                className="w-full pr-10 pl-4 py-2.5 rounded-lg 
+                  border border-[var(--border)] 
+                  bg-[var(--bg-primary)] 
+                  text-[var(--text-primary)]
+                  placeholder-[color:var(--text-primary)]
+                  focus:ring-2 focus:ring-[var(--focus-ring)] 
+                  outline transition appearance-none"
               >
                 <option value="respondent">Respondent</option>
                 <option value="creator">Form Creator</option>
                 <option value="admin">Admin</option>
               </select>
+              </div>
             </div>
 
             {/* Password */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold uppercase">
+              <label className="text-xs font-bold uppercase text-[var(--text-primary)]">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)]" />
                 <input
                   type="password"
                   required
                   value={formData.password}
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg"
+        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg 
+                  border border-[var(--border)] 
+                  bg-[var(--bg-primary)] 
+                  text-[var(--text-primary)]
+                  placeholder-[color:var(--text-primary)]
+                  focus:ring-2 focus:ring-[var(--focus-ring)] 
+                  outline transition appearance-none"
                   placeholder="••••••••"
                 />
               </div>
@@ -162,22 +145,25 @@ const Register = () => {
 
             {/* Confirm Password */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-bold uppercase">
+              <label className="text-xs font-bold uppercase text-[var(--text-primary)]">
                 Confirm Password
               </label>
               <div className="relative">
-                <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)]" />
                 <input
                   type="password"
                   required
                   value={formData.confirmPassword}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      confirmPassword: e.target.value,
-                    })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 border rounded-lg"
+        onChange={(e) =>
+          setFormData({ ...formData, confirmPassword: e.target.value })
+        }
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg 
+                  border border-[var(--border)] 
+                  bg-[var(--bg-primary)] 
+                  text-[var(--text-primary)]
+                  placeholder-[color:var(--text-primary)]
+                  focus:ring-2 focus:ring-[var(--focus-ring)] 
+                  outline transition appearance-none"
                   placeholder="••••••••"
                 />
               </div>
@@ -193,9 +179,9 @@ const Register = () => {
 
           </form>
 
-          <p className="text-center mt-6 text-sm">
+          <p className="text-center mt-6 text-sm text-[var(--text-secondary)]">
             Already have an account?{" "}
-            <Link to="/login" className="text-[var(--primary)] font-bold">
+            <Link to="/Login" className="text-[var(--text-primary)] font-bold">
               Login
             </Link>
           </p>

@@ -44,7 +44,6 @@ const Hero = () => {
               src={assets.img3}
               alt="Creative Team Performance"
               className=" object-contain drop-shadow-xl rounded-lg"
-              loading="lazy"
             />
 
           </div>

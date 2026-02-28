@@ -43,25 +43,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* --- ADMIN ONLY STATS --- */}
-        {role === 'admin' && (
-          <div className="col-span-full mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white p-6 rounded-xl shadow border border-[var(--border-color)] flex items-center gap-4">
-              <Users className="text-purple-600" />
-              <div>
-                <p className="text-sm text-gray-500">Total Users</p>
-                <p className="text-2xl font-bold">1,240</p>
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow border border-[var(--border-color)] flex items-center gap-4">
-              <BarChart className="text-green-600" />
-              <div>
-                <p className="text-sm text-gray-500">System Traffic</p>
-                <p className="text-2xl font-bold">High</p>
-              </div>
-            </div>
-          </div>
-        )}
+      
       </div>
     </div>
   );

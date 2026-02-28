@@ -9,7 +9,7 @@ const ContactUs = () => {
 
   return (
     <section className="bg-[var(--bg-primary)] min-h-screen py-16 px-6 transition-colors duration-300">
-      <div className="container mx-auto max-w-6xl">
+      <div className="container mx-auto max-w-6xl ">
 
         {/* Header */}
         <div className="text-center mb-16">

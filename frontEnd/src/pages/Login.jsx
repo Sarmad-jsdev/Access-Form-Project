@@ -1,41 +1,43 @@
 import React, { useState } from "react";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import axios from "axios";
 
 const Login = ({ setIsLoggedIn }) => {
-  const [showPassword, setShowPassword] = useState(false);
+  const { setUser, login } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    try {
+      const res = await axios.post("http://localhost:5000/api/auth/Login", { email, password });
 
-    // 1️⃣ LocalStorage se users nikalein
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    // 2️⃣ Match karein email & password
-    const foundUser = users.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (foundUser) {
-      // 3️⃣ Current user save karein
-      localStorage.setItem("currentUser", JSON.stringify(foundUser));
-
+      login(res.data.token);        // save token
+      setUser(res.data.user);       // 🔥 update global user state instantly
+      
+      // JWT info save
+      localStorage.setItem("token", res.data.token);
       setIsLoggedIn(true);
 
-      alert(`Welcome ${foundUser.role}!`);
-
-      navigate("/Dashboard");
-    } else {
-      alert("Invalid Email or Password! Please try again.");
+      // Role based dashboard
+      const role = res.data.user.role;
+      if (role === "admin") navigate("/AdminDashboard");
+      else if (role === "creator") navigate("/dashboard");
+      else navigate("dashboard");
+    } catch (err) {
+      alert(err.response?.data?.message || "Login failed");
     }
   };
 
+
   return (
-    <div className="min-h-[90vh] bg-[var(--bg-secondary)] text-[var(--text-secondary)] flex items-center justify-center px-4 py-12 transition-colors duration-300 border-b border-[var(--border-color)] shadow-sm">
-      <div className="max-w-md w-full bg-[var(--bg-primary)] rounded-2xl shadow-xl border border-[var(--border-color)] overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg-secondary)] text-[var(--text-secondary)] flex items-center justify-center px-4 py-12 transition-colors duration-300 border-b border-[var(--border)] shadow-sm">
+      <div className="max-w-md w-full bg-[var(--bg-primary)] rounded-2xl shadow-xl border border-[var(--border)] overflow-hidden">
         
         <div className="p-8">
           
@@ -62,10 +64,16 @@ const Login = ({ setIsLoggedIn }) => {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="name@email.com"
-                  className="w-full pl-10 pr-4 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg 
+                  border border-[var(--border)] 
+                  bg-[var(--bg-primary)] 
+                  text-[var(--text-primary)]
+                  placeholder-[color:var(--text-secondary)]
+                  focus:ring-2 focus:ring-[var(--focus-ring)] 
+                  outline-none transition "
                 />
               </div>
             </div>
@@ -85,7 +93,13 @@ const Login = ({ setIsLoggedIn }) => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-12 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none transition"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg 
+                  border border-[var(--border)] 
+                  bg-[var(--bg-primary)] 
+                  text-[var(--text-primary)]
+                  placeholder-[color:var(--text-secondary)]
+                  focus:ring-2 focus:ring-[var(--focus-ring)] 
+                  outline-none transition"
                 />
                 <button
                   type="button"

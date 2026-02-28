@@ -35,7 +35,6 @@ const HeroSection = () => {
               src={assets.img1}
               alt="Creative Team Performance"
               className=" object-contain rounded-lg"
-              loading="lazy"
             />
 
           </div>
