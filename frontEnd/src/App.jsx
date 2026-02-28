@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Navbar from './Components/Navbar';
 import Footer from './Components/footer';
 import Home from './pages/Home';
@@ -19,7 +19,7 @@ const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
 
     <AuthProvider>
       {/* Navbar yahan Routes se bahar hai, isliye har page par dikhega */}
@@ -44,7 +44,7 @@ const App = () => {
 
       </AuthProvider>
       
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
