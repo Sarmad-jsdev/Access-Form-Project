@@ -5,7 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import axios from "axios";
 
-const Login = ({ setIsLoggedIn }) => {
+const Login = () => {
   const { setUser, login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -15,14 +15,16 @@ const Login = ({ setIsLoggedIn }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/Login", { email, password });
 
-      login(res.data.token);        // save token
-      setUser(res.data.user);       // 🔥 update global user state instantly
+      // Dynamically get the URL from environment variables
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, { email, password });
+
+          // ✅ Use context login to update state immediately
+    login(res.data.token, res.data.user);
       
       // JWT info save
       localStorage.setItem("token", res.data.token);
-      setIsLoggedIn(true);
 
       // Role based dashboard
       const role = res.data.user.role;
@@ -36,7 +38,7 @@ const Login = ({ setIsLoggedIn }) => {
 
 
   return (
-    <div className="min-h-screen bg-[var(--bg-secondary)] text-[var(--text-secondary)] flex items-center justify-center px-4 py-12 transition-colors duration-300 border-b border-[var(--border)] shadow-sm">
+    <div className="min-h-80vh bg-[var(--bg-secondary)] text-[var(--text-secondary)] flex items-center justify-center px-4 py-8 transition-colors duration-300 border-b border-[var(--border)] shadow-sm">
       <div className="max-w-md w-full bg-[var(--bg-primary)] rounded-2xl shadow-xl border border-[var(--border)] overflow-hidden">
         
         <div className="p-8">

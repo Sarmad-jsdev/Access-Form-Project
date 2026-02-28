@@ -16,8 +16,6 @@ import AdminDashboard from './pages/AdminDashboard';
 
 const App = () => {
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   return (
     <BrowserRouter>
 
@@ -34,10 +32,10 @@ const App = () => {
         <Route path="/about" element={<Aboutus />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/Login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
-        <Route path="/Dashboard" element={  <ProtectedRoute> <Dashboard isLoggedIn={isLoggedIn} /></ProtectedRoute >} />
-        <Route path="/AdminDashboard" element={  <ProtectedRoute> <AdminDashboard isLoggedIn={isLoggedIn} /></ProtectedRoute >} />
+        <Route path="/Dashboard" element={  <ProtectedRoute> <Dashboard /></ProtectedRoute >} />
+        <Route path="/AdminDashboard" element={  <ProtectedRoute> <AdminDashboard /></ProtectedRoute >} />
       </Routes>
       
       <Footer />

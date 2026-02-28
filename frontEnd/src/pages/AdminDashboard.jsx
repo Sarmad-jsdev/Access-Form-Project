@@ -12,10 +12,14 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const token = localStorage.getItem("token");
 
+  // Dynamically get the URL from environment variables
+  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   // Fetch dashboard data from backend
   const fetchDashboard = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/dashboard", {
+      // Dynamically get the URL from environment variables
+      const res = await axios.get(`${API_BASE_URL}/api/admin/dashboard`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStats(res.data.stats);
@@ -33,8 +37,9 @@ const AdminDashboard = () => {
   // Toggle user status
   const toggleUserStatus = async (userId) => {
     try {
+      
       await axios.put(
-        `http://localhost:5000/api/admin/block/${userId}`,
+        `${API_BASE_URL}/api/admin/block/${userId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

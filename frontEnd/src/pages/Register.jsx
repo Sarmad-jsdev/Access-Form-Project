@@ -18,7 +18,11 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", formData);
+      console.log("Sending role:", formData.role);
+
+      // Dynamically get the URL from environment variables
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const res = await axios.post(`${API_BASE_URL}/api/auth/register`, formData);
       alert(res.data.message);
       navigate("/login");
     } catch (err) {
@@ -114,7 +118,6 @@ const Register = () => {
               >
                 <option value="respondent">Respondent</option>
                 <option value="creator">Form Creator</option>
-                <option value="admin">Admin</option>
               </select>
               </div>
             </div>

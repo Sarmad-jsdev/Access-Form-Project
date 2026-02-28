@@ -4,56 +4,34 @@ import jwt from "jsonwebtoken";
 
 // REGISTER
 export const registerUser = async (req, res) => {
-  try {
-    const { name, email, password, accountType } = req.body;
+  const { name, email, password, role } = req.body;
 
-    if (!["creator", "respondent"].includes(accountType)) {
-      return res.status(400).json({ message: "Invalid account type" });
-    }
+  // Only allow non-admin roles
+  if (role === "admin") return res.status(403).json({ message: "Cannot register as admin" });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+  const exists = await User.findOne({ email });
+  if (exists) return res.status(400).json({ message: "Email already exists" });
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role: accountType,
-    });
-
-    res.status(201).json({ message: "User registered successfully" });
-
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await User.create({ name, email, password: hashedPassword, role });
+  res.status(201).json({ message: "Registered successfully", user });
 };
 
 // LOGIN
 export const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1d" }
-    );
+  res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+};
 
-    res.json({
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        role: user.role,
-      },
-    });
-
-  } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
+// GET CURRENT USER
+export const getCurrentUser = async (req, res) => {
+  res.json(req.user);
 };
