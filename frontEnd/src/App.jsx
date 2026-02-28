@@ -16,6 +16,8 @@ import AdminDashboard from './pages/AdminDashboard';
 
 const App = () => {
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   return (
     <BrowserRouter>
 
