@@ -2,7 +2,60 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-/* ================= REGISTER ================= */
+export const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+
+    // Generate JWT
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // ✅ Set cookie with proper settings for cross-domain
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,        // HTTPS only
+      sameSite: "none",    // ✅ Allow cross-site (third-party)
+      domain: ".vercel.app", // ✅ Share across all Vercel domains
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+    });
+
+    // ✅ Also return token for localStorage backup
+    res.status(200).json({
+      message: "Login successful",
+      token: token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const logoutUser = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    domain: ".vercel.app",
+    path: "/",
+  });
+  res.status(200).json({ message: "Logged out successfully" });
+};
 
 export const registerUser = async (req, res) => {
   try {
@@ -40,62 +93,6 @@ export const registerUser = async (req, res) => {
   }
 };
 
-/* ================= LOGIN ================= */
-
-export const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) return res.status(401).json({ message: "Invalid credentials" });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
-
-    // Generate JWT
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    // Set cookie for cross-origin (frontend on Vercel)
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,      // MUST be true on production HTTPS
-      sameSite: "none",  // allows cross-origin
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: "/",
-    });
-
-    res.status(200).json({
-      message: "Login successful",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-/* ================= LOGOUT ================= */
-
-export const logoutUser = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    path: "/",
-  });
-  res.status(200).json({ message: "Logged out successfully" });
-};
-
-
-/* ================= GET CURRENT USER ================= */
 export const getCurrentUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
