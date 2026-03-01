@@ -20,7 +20,7 @@ app.set("trust proxy", 1);
 
 // CORS setup for your frontend
 app.use(cors({
-  origin: "https://accessform-lhaa9ajk1-sarmad-jsdevs-projects.vercel.app", // frontend URL
+  origin: "https://accessform-git-main-sarmad-jsdevs-projects.vercel.app", // frontend URL
   credentials: true, // allow cookies to be sent
 }));
 
