@@ -18,28 +18,34 @@ const app = express();
 // Trust Vercel proxy
 app.set("trust proxy", 1);
 
-// Get frontend URL from environment variable
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
-
-// CORS setup
-const allowedOrigins = [
-  FRONTEND_URL,
-  "http://localhost:3000",
-  "http://localhost:3001",
-];
-
+// ✅ WILDCARD CORS - Accept ANY Vercel domain + localhost
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Accept these:
+    // 1. No origin (curl, mobile apps, etc)
+    // 2. localhost (development)
+    // 3. ANY *.vercel.app domain (production + previews)
+    
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Check if it's localhost or vercel.app domain
+    const isLocalhostOrVercel = 
+      /^http:\/\/localhost(:\d+)?$/.test(origin) ||
+      /^https:\/\/.*\.vercel\.app$/.test(origin);
+
+    if (isLocalhostOrVercel) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS: " + origin));
+      console.warn(`❌ CORS rejected origin: ${origin}`);
+      callback(new Error("CORS: Origin not allowed - " + origin));
     }
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400, // 24 hours
 }));
 
 app.use(express.json());
