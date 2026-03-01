@@ -18,12 +18,24 @@ const app = express();
 // Trust Vercel proxy
 app.set("trust proxy", 1);
 
-// CORS setup for your frontend
-app.use(cors({
-  origin: "https://accessform-git-main-sarmad-jsdevs-projects.vercel.app", // frontend URL
-  credentials: true, // allow cookies to be sent
-}));
+// CORS setup with environment variable
+const allowedOrigins = [
+  process.env.FRONTEND_URL || "https://accessform-lhaa9ajk1-sarmad-jsdevs-projects.vercel.app",
+  "http://localhost:3000", // for local development
+];
 
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 app.use(express.json());
 app.use(cookieParser());
