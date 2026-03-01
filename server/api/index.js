@@ -15,38 +15,37 @@ import respondantRoutes from "../routes/respondantRoutes.js";
 
 const app = express();
 
+// Trust Vercel proxy
 app.set("trust proxy", 1);
 
-// ✅ CORS CONFIGURATION FOR THIRD-PARTY COOKIES
+// ✅ WILDCARD CORS - Accept ANY Vercel domain + localhost
 app.use(cors({
   origin: function (origin, callback) {
-    // Accept all Vercel domains + localhost
-    if (!origin || 
-        /^http:\/\/localhost/.test(origin) || 
-        /^https:\/\/.*\.vercel\.app$/.test(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("CORS denied"));
+    // Accept these:
+    // 1. No origin (curl, mobile apps, etc)
+    // 2. localhost (development)
+    // 3. ANY *.vercel.app domain (production + previews)
+    
+    if (!origin) {
+      return callback(null, true);
     }
-  },
-  credentials: true,  // ✅ MUST be true for cookies
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  maxAge: 86400,
-}));
 
-// ✅ Handle preflight requests
-app.options('*', cors({
-  origin: function (origin, callback) {
-    if (!origin || 
-        /^http:\/\/localhost/.test(origin) || 
-        /^https:\/\/.*\.vercel\.app$/.test(origin)) {
+    // Check if it's localhost or vercel.app domain
+    const isLocalhostOrVercel = 
+      /^http:\/\/localhost(:\d+)?$/.test(origin) ||
+      /^https:\/\/.*\.vercel\.app$/.test(origin);
+
+    if (isLocalhostOrVercel) {
       callback(null, true);
     } else {
-      callback(new Error("CORS denied"));
+      console.warn(`❌ CORS rejected origin: ${origin}`);
+      callback(new Error("CORS: Origin not allowed - " + origin));
     }
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  maxAge: 86400, // 24 hours
 }));
 
 app.use(express.json());
