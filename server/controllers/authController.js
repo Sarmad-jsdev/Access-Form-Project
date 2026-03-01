@@ -1,3 +1,7 @@
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -15,18 +19,20 @@ export const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // Set cookie for cross-origin
+    // ✅ Set cookie with proper settings for cross-domain
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: true,        // HTTPS only
+      sameSite: "none",    // ✅ Allow cross-site (third-party)
+      domain: ".vercel.app", // ✅ Share across all Vercel domains
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     });
 
+    // ✅ Also return token for localStorage backup
     res.status(200).json({
       message: "Login successful",
-      token: token, // ✅ Return token for localStorage
+      token: token,
       user: {
         id: user._id,
         name: user.name,
@@ -34,6 +40,69 @@ export const loginUser = async (req, res) => {
         role: user.role,
       },
     });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const logoutUser = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    domain: ".vercel.app",
+    path: "/",
+  });
+  res.status(200).json({ message: "Logged out successfully" });
+};
+
+export const registerUser = async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    if (role === "admin") {
+      return res.status(403).json({ message: "Cannot register as admin" });
+    }
+
+    const exists = await User.findOne({ email });
+    if (exists) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    res.status(201).json({
+      message: "Registered successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getCurrentUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(user);
+
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
