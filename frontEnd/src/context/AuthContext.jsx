@@ -8,25 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/api/auth/me`);
-      setUser(res.data);
-    } catch (err) {
-      // Only set user to null, don't log 401
-      if (err.response && err.response.status === 401) {
-        setUser(null); 
-      } else {
-        console.error("Failed to fetch user:", err); // only unexpected errors
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchUser();
-}, []);
+  useEffect(() => { const fetchUser = async () => { try { const res = await axios.get(`${API_BASE_URL}/api/auth/me`); setUser(res.data); } catch (err) { setUser(null); } finally { setLoading(false); } }; if (document.cookie.includes("token")) { fetchUser(); } else { setLoading(false); } }, []);
 
 
   // LOGIN FUNCTION
