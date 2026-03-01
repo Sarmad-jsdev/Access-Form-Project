@@ -3,7 +3,6 @@ import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
-import axios from "axios";
 
 const Login = () => {
   const { login, user } = useContext(AuthContext);

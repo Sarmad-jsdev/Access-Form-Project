@@ -46,17 +46,11 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log("JWT SECRET LOGIN:", process.env.JWT_SECRET);
-
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+    if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
     // Generate JWT
     const token = jwt.sign(
@@ -65,13 +59,14 @@ export const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-  // loginUser
-res.cookie("token", token, {
-  httpOnly: true,
-  sameSite: "none",  // <-- change from 'none' to 'lax'
-  secure: true,    // must be false on localhost
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
+    // Set cookie for cross-origin (frontend on Vercel)
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,      // MUST be true on production HTTPS
+      sameSite: "none",  // allows cross-origin
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: "/",
+    });
 
     res.status(200).json({
       message: "Login successful",
@@ -90,17 +85,14 @@ res.cookie("token", token, {
 /* ================= LOGOUT ================= */
 
 export const logoutUser = (req, res) => {
-  // LOGOUT
-// logoutUser
-res.clearCookie("token", {
-  httpOnly: true,
-  sameSite: "none",  // match login
-  secure: true,    // match login
-  path: "/",
-});
-
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+  });
   res.status(200).json({ message: "Logged out successfully" });
-}
+};
 
 
 /* ================= GET CURRENT USER ================= */
