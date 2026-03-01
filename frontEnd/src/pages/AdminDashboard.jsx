@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../axiosConfig"; // Use configured axios
 import { Users, BarChart, CheckCircle, UserX } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -10,18 +10,12 @@ const AdminDashboard = () => {
     totalResponses: 0,
   });
   const [users, setUsers] = useState([]);
-  const token = localStorage.getItem("token");
-
-  // Dynamically get the URL from environment variables
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   // Fetch dashboard data from backend
   const fetchDashboard = async () => {
     try {
-      // Dynamically get the URL from environment variables
-      const res = await axios.get(`${API_BASE_URL}/api/admin/dashboard`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // axiosInstance already has withCredentials: true
+      const res = await axiosInstance.get("/api/admin/dashboard");
       setStats(res.data.stats);
       setUsers(res.data.users);
     } catch (err) {
@@ -37,11 +31,10 @@ const AdminDashboard = () => {
   // Toggle user status
   const toggleUserStatus = async (userId) => {
     try {
-      
-      await axios.put(
-        `${API_BASE_URL}/api/admin/block/${userId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
+      // cookies are sent automatically
+      await axiosInstance.put(
+        `/api/admin/block/${userId}`,
+        {}
       );
       fetchDashboard(); // Refresh data after status change
     } catch (err) {
@@ -58,7 +51,7 @@ const AdminDashboard = () => {
         </h1>
       </header>
 
-      {/* --- Stats Cards --- */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow border flex items-center gap-4">
           <Users className="text-blue-600" size={36} />
@@ -87,49 +80,48 @@ const AdminDashboard = () => {
         <div className="bg-white p-6 rounded-xl shadow border flex items-center gap-4">
           <UserX className="text-red-600" size={36} />
           <div>
-            <p className="text-sm text-gray-500">Total Responses</p>
-            <p className="text-2xl font-bold">{stats.totalResponses}</p>
+            <p className="text-sm text-gray-500">Blocked Users</p>
+            <p className="text-2xl font-bold">{stats.totalUsers - stats.activeUsers}</p>
           </div>
         </div>
       </div>
 
-      {/* --- Users Table --- */}
-      <div className="bg-white shadow rounded-xl border overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      {/* Users Table */}
+      <div className="bg-white p-6 rounded-xl shadow">
+        <h2 className="text-2xl font-bold mb-4">Users</h2>
+        <table className="w-full text-left">
+          <thead className="border-b">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Email
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Role
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Action
-              </th>
+              <th className="pb-2">Name</th>
+              <th className="pb-2">Email</th>
+              <th className="pb-2">Role</th>
+              <th className="pb-2">Status</th>
+              <th className="pb-2">Action</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody>
             {users.map((user) => (
-              <tr key={user._id}>
-                <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{user.role}</td>
-                <td className="px-6 py-4 whitespace-nowrap capitalize">{user.status}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
+              <tr key={user._id} className="border-b">
+                <td className="py-2">{user.name}</td>
+                <td className="py-2">{user.email}</td>
+                <td className="py-2">
+                  <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                    {user.role}
+                  </span>
+                </td>
+                <td className="py-2">
+                  {user.isBlocked ? (
+                    <span className="text-red-600 font-semibold">Blocked</span>
+                  ) : (
+                    <span className="text-green-600 font-semibold">Active</span>
+                  )}
+                </td>
+                <td className="py-2">
                   <button
                     onClick={() => toggleUserStatus(user._id)}
-                    className={`px-4 py-2 rounded-lg text-white font-bold ${
-                      user.status === "active" ? "bg-red-600" : "bg-green-600"
-                    }`}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                   >
-                    {user.status === "active" ? "Block" : "Activate"}
+                    {user.isBlocked ? "Unblock" : "Block"}
                   </button>
                 </td>
               </tr>
