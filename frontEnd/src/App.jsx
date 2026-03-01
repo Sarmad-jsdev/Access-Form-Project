@@ -1,51 +1,103 @@
-import React, { useState } from 'react'
-import { HashRouter, Routes, Route } from "react-router-dom";
-import Navbar from './Components/Navbar';
-import Footer from './Components/footer';
-import Home from './pages/Home';
-import Aboutus from './pages/AboutUs';
-import ContactUs from './pages/ContactUs';
-import Settings from './pages/settings';
-import ScrollToTop from './Components/ScrollToTop';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './context/ProtectedRoute';
-import AdminDashboard from './pages/AdminDashboard';
+import React, { useState } from "react";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
+import Navbar from "./Components/Navbar";
+import Footer from "./Components/footer";
+import Home from "./pages/Home";
+import Aboutus from "./pages/AboutUs";
+import ContactUs from "./pages/ContactUs";
+import Settings from "./pages/settings";
+import ScrollToTop from "./Components/ScrollToTop";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./context/ProtectedRoute";
+import AdminDashboard from "./pages/AdminDashboard";
+import CreatorDashboard from "./pages/CreatorDashboard";
+import Respondant from "./pages/Respondant";
+import CreateForm from "./pages/CreateForm";
+import EditSurvey from "./pages/EditSurvey";
+import PreviewSurvey from "./pages/PreviewSurvey";
+import SurveyAnalytics from "./pages/SurveyAnalytics";
 
 const App = () => {
-
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   return (
-    <HashRouter>
-
-    <AuthProvider>
-      {/* Navbar yahan Routes se bahar hai, isliye har page par dikhega */}
-      <Navbar />
+    <BrowserRouter>
+      <AuthProvider>
+        {/* Navbar yahan Routes se bahar hai, isliye har page par dikhega */}
+        <Navbar />
 
         {/* ScrollToTop component har route change par scroll ko top par le jaayega */}
-      <ScrollToTop />
-      
-      <Routes>
-        {/* Yahan aap apne routes define kar sakte hain */}
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<Aboutus />} />
-        <Route path="/contact" element={<ContactUs />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/Register" element={<Register />} />
-        <Route path="/Dashboard" element={  <ProtectedRoute> <Dashboard /></ProtectedRoute >} />
-        <Route path="/AdminDashboard" element={  <ProtectedRoute> <AdminDashboard /></ProtectedRoute >} />
-      </Routes>
-      
-      <Footer />
+        <ScrollToTop />
 
+        <Routes>
+          {/* Yahan aap apne routes define kar sakte hain */}
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<Aboutus />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/Login" element={<Login />} />
+          <Route path="/Register" element={<Register />} />
+          <Route
+            path="/Respondant"
+            element={
+              <ProtectedRoute>
+                <Respondant />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/AdminDashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/creator-dashboard"
+            element={
+              <ProtectedRoute>
+                <CreatorDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/CreateForm"
+            element={
+              <ProtectedRoute>
+                <CreateForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit/:id"
+            element={
+              <ProtectedRoute role="creator">
+                <EditSurvey />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+  path="/preview/:id"
+  element={
+    <ProtectedRoute role="creator">
+      <PreviewSurvey />
+    </ProtectedRoute>
+  }
+/>      <Route
+  path="/analytics/:id"
+  element={
+    <ProtectedRoute role="creator">
+      <SurveyAnalytics />
+    </ProtectedRoute>
+  }
+/>
+        </Routes>
+
+        <Footer />
       </AuthProvider>
-      
-    </HashRouter>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
