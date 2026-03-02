@@ -21,13 +21,12 @@ export const loginUser = async (req, res) => {
 
     // ✅ Set cookie with proper settings for cross-domain
     res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,        // HTTPS only
-      sameSite: "none",    // ✅ Allow cross-site (third-party)
-      domain: ".vercel.app", // ✅ Share across all Vercel domains
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: "/",
-    });
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: "/",
+});
 
     // ✅ Also return token for localStorage backup
     res.status(200).json({
@@ -48,12 +47,11 @@ export const loginUser = async (req, res) => {
 
 export const logoutUser = (req, res) => {
   res.clearCookie("token", {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    domain: ".vercel.app",
-    path: "/",
-  });
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  path: "/",
+});
   res.status(200).json({ message: "Logged out successfully" });
 };
 
