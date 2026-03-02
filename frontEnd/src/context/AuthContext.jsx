@@ -18,12 +18,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
-
-    if (document.cookie.includes("token")) {
       fetchUser();
-    } else {
-      setLoading(false);
-    }
   }, []);
 
   // LOGIN FUNCTION
