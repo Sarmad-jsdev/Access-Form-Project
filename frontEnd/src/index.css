@@ -1,9 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
 @import "tailwindcss";
+
 
 * {
   transition: background-color 0.3s ease,
               color 0.3s ease,
              border-color 0.3s ease;
+  font-family: 'Manrope', sans-serif;
 }
 
 html {
@@ -26,6 +32,9 @@ select:-webkit-autofill {
 
 
 
+/* ==============================
+   BASE COLORS
+   ============================== */
 :root {
   --bg-primary: #E1DFEA;
   --bg-secondary: #FFFFFF;
@@ -38,8 +47,19 @@ select:-webkit-autofill {
   --focus-ring: #2563EB;
 
   --text-on-primary: #0F172A; 
+
+  /* Button colors */
+  --btn-delete: #DC2626;  /* Red delete button stays the same on all themes */
+  --btn-primary: var(--primary);
+  --btn-secondary: var(--accent);
+
+  /* Dyslexia-friendly font */
+  --font-dyslexia: 'Lexend', Arial, sans-serif;
 }
 
+/* ==============================
+   DARK THEME
+   ============================== */
 .dark {
   --bg-primary: #0F172A;
   --bg-secondary: #1E293B;
@@ -54,19 +74,38 @@ select:-webkit-autofill {
   --text-on-primary: #F1F5F9; 
 }
 
+/* ==============================
+   HIGH CONTRAST THEME
+   ============================== */
 .high-contrast {
-  --bg-primary: #000000;
-  --bg-secondary: #000000;
-  /* Text primary ko pure white rakhein taake black par chamke */
-  --text-primary: #FFFFFF; 
-  --text-secondary: #FFFF00; /* Secondary text ko yellow  focus ke liye */
-  --primary: #FFFF00; /* Bright Yellow */
-  --primary-dark: #FFD700;
-  --accent: #00FFFF;
-  --border: #FFFFFF;
-  --focus-ring: #00FFFF; 
-  
-  /* Yellow background par hamesha black text hona chahiye */
-  --text-on-primary: #000000; 
+  --bg-primary: #000000;        /* Page background */
+  --bg-secondary: #1a1a1a;      /* Card/Table background */
+  --text-primary: #FFFFFF;      /* Headings / important text */
+  --text-secondary: #FFFF00;    /* Secondary text */
+  --primary: #FFFF00;           /* Buttons / highlights */
+  --primary-dark: #FFD700;      /* Darker highlight / hover */
+  --accent: #00FFFF;            /* Accent / icons / shadows */
+  --border: #FFFF00;            /* Borders for cards/tables */
+  --focus-ring: #00FFFF;        /* Focus outlines */
+
+  --text-on-primary: #000000;   /* Text on primary buttons */
 }
 
+
+/* ==============================
+   DYSLEXIA-FRIENDLY THEME
+   ============================== */
+.dyslexia {
+  --bg-primary: #F7F3E8;      /* Off-white, low contrast background */
+  --bg-secondary: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --primary: #0F766E;
+  --primary-dark: #0B4C3B;
+  --accent: #14B8A6;
+  --border: #E2E8F0;
+  --focus-ring: #2563EB;
+
+  --text-on-primary: #0F172A;
+  --font-family: var(--font-dyslexia);
+}

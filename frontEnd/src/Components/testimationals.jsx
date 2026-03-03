@@ -21,42 +21,55 @@ const TestimonialsSection = () => {
     {
       name: "Amina K.",
       role: "UX Designer",
-      text: "Its the only survey tool Ive found that actually works perfectly with just a keyboard.",
+      text: "It's the only survey tool I've found that actually works perfectly with just a keyboard.",
     },
   ];
 
   return (
-    <section className="body-font bg-[var(--bg-primary)] text-[var(--text-secondary)] transition-colors duration-300 border-b border-[var(--border-color)] shadow-sm">
+    <section
+      className="body-font bg-[var(--bg-primary)] text-[var(--text-secondary)] transition-colors duration-300 border-b border-[var(--border-color)] shadow-sm"
+      role="region"
+      aria-labelledby="testimonials-heading"
+    >
       <div className="container-fluid px-5 py-10 mx-auto">
 
         {/* Section Heading */}
         <div className="flex flex-col text-center w-full mb-10">
-          <h1 className="sm:text-3xl text-2xl font-medium title-font text-[var(--text-primary)]">
-            Trusted by Inclusive Teams.
-          </h1> 
-          <p className="text-md font-medium pt-3  text-[var(--text-primary)]">
-             See how we help organizations reach 100% of their audience.
+          <h2
+            id="testimonials-heading"
+            className="sm:text-3xl text-2xl font-medium title-font text-[var(--text-primary)]"
+          >
+            Trusted by Inclusive Teams
+          </h2> 
+          <p className="text-md font-medium pt-3 text-[var(--text-primary)]">
+            See how we help organizations reach 100% of their audience.
           </p>
         </div>
 
         {/* Testimonials Grid */}
-        <div className="flex flex-wrap m-4">
+        <div className="flex flex-wrap m-4" role="list">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="p-4 md:w-1/2 w-full">
+            <div key={index} className="p-4 md:w-1/2 w-full" role="listitem">
               <div className="h-full bg-[var(--bg-secondary)] border border-[var(--border)] p-8 rounded-xl transition-all duration-300 hover:shadow-lg">
 
                 {/* Quote Icon */}
-                <img src={assets.quote} alt="quote" className="w-8 h-8 mb-4 invert-[.5]" loading="lazy"/>
+                <img
+                  src={assets.quote}
+                  alt=""
+                  aria-hidden="true"
+                  className="w-8 h-8 mb-4 invert-[.5]"
+                  loading="lazy"
+                />
 
-                {/* Text */}
-                <p className="leading-relaxed mb-6">
+                {/* Testimonial Text */}
+                <p className="leading-relaxed mb-6 text-[var(--text-primary)]">
                   {testimonial.text}
                 </p>
 
                 {/* User Info */}
                 <div className="inline-flex items-center">
                   <span className="flex-grow flex flex-col pl-4">
-                    <span className="title-font font-medium text-[var(--text-secondary)]">
+                    <span className="title-font font-medium text-[var(--text-primary)]">
                       {testimonial.name}
                     </span>
                     <span className="text-sm text-[var(--text-secondary)]">

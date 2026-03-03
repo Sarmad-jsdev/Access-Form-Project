@@ -1,21 +1,24 @@
-import React, { useEffect, useState } from "react";
-import axiosInstance   from "../axiosConfig"; // Use the configured axios instance
+import React, { useEffect, useState, useRef } from "react";
+import axiosInstance from "../axiosConfig";
 import { useParams, useNavigate } from "react-router-dom";
 
 const EditSurvey = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_BASE_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const [survey, setSurvey] = useState(null);
+  const headingRef = useRef(null);
 
-  // Fetch survey details
+  // Fetch survey
   useEffect(() => {
     const fetchSurvey = async () => {
       try {
-        const res = await axiosInstance.get(`${API_BASE_URL}/api/creator/survey/${id}`, {
-          withCredentials: true,
-        });
+        const res = await axiosInstance.get(
+          `${API_BASE_URL}/api/creator/survey/${id}`,
+          { withCredentials: true }
+        );
         setSurvey(res.data);
       } catch (error) {
         console.error("Error fetching survey:", error);
@@ -25,7 +28,13 @@ const EditSurvey = () => {
     fetchSurvey();
   }, [id]);
 
-  // Update survey API call
+  // Move focus to heading after load (WCAG focus management)
+  useEffect(() => {
+    if (survey && headingRef.current) {
+      headingRef.current.focus();
+    }
+  }, [survey]);
+
   const handleUpdate = async () => {
     try {
       await axiosInstance.put(
@@ -41,16 +50,18 @@ const EditSurvey = () => {
     }
   };
 
-  // Safe loading check
   if (!survey) {
     return (
-      <div className="p-8">
-        <p>Loading survey...</p>
+      <div
+        className="p-8 min-h-screen bg-[var(--bg-secondary)]"
+        role="status"
+        aria-live="polite"
+      >
+        <p className="text-[var(--text-primary)]">Loading survey...</p>
       </div>
     );
   }
 
-  // Handle changes to a question
   const handleQuestionChange = (index, field, value) => {
     const updatedQuestions = [...survey.questions];
     updatedQuestions[index][field] = value;
@@ -58,76 +69,143 @@ const EditSurvey = () => {
   };
 
   return (
-    <div className="min-h-screen p-8 bg-[var(--bg-secondary)]">
-
-      {/* Back button */}
+    <main className="min-h-screen p-8 bg-[var(--bg-secondary)]">
+      {/* Back Button */}
       <button
+        type="button"
         onClick={() => navigate("/creator-dashboard")}
-        className="mb-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+        className="mb-6 px-4 py-2 rounded-lg bg-[var(--bg-primary)] 
+                   text-[var(--text-primary)] border border-[var(--border)] 
+                   focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+        aria-label="Back to Dashboard"
       >
         ← Back to Dashboard
       </button>
 
-      <div className="bg-white p-8 rounded-xl shadow max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-4">Edit Survey</h1>
+      <section
+        className="bg-[var(--bg-primary)] p-8 rounded-xl shadow max-w-3xl mx-auto"
+        aria-labelledby="edit-survey-heading"
+      >
+        <h1
+          id="edit-survey-heading"
+          ref={headingRef}
+          tabIndex="-1"
+          className="text-3xl font-bold mb-6 text-[var(--text-primary)] focus:outline-none"
+        >
+          Edit Survey
+        </h1>
 
         {/* Survey Title */}
-        <input
-          type="text"
-          value={survey.title}
-          onChange={(e) => setSurvey({ ...survey, title: e.target.value })}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Survey Title"
-        />
+        <label className="block mb-4">
+          <span className="block font-semibold text-[var(--text-primary)] mb-1">
+            Survey Title
+          </span>
+          <input
+            type="text"
+            value={survey.title}
+            onChange={(e) =>
+              setSurvey({ ...survey, title: e.target.value })
+            }
+            className="w-full border border-[var(--border)] p-3 rounded 
+                       bg-[var(--bg-secondary)] text-[var(--text-primary)]
+                       focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+            aria-required="true"
+          />
+        </label>
 
         {/* Survey Description */}
-        <textarea
-          value={survey.description}
-          onChange={(e) => setSurvey({ ...survey, description: e.target.value })}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Survey Description"
-        />
+        <label className="block mb-6">
+          <span className="block font-semibold text-[var(--text-primary)] mb-1">
+            Survey Description
+          </span>
+          <textarea
+            value={survey.description}
+            onChange={(e) =>
+              setSurvey({ ...survey, description: e.target.value })
+            }
+            className="w-full border border-[var(--border)] p-3 rounded 
+                       bg-[var(--bg-secondary)] text-[var(--text-primary)]
+                       focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+            aria-required="true"
+          />
+        </label>
 
         {/* Questions */}
-        {survey.questions?.map((q, index) => (
-          <div key={index} className="mb-6 border-b pb-4">
-            <label className="block font-semibold mb-1">Question {index + 1}</label>
-            <input
-              type="text"
-              value={q.questionText}
-              onChange={(e) => handleQuestionChange(index, "questionText", e.target.value)}
-              className="w-full border p-2 rounded mb-2"
-              placeholder="Question text"
-            />
+        <div aria-labelledby="questions-heading">
+          <h2
+            id="questions-heading"
+            className="text-xl font-semibold mb-4 text-[var(--text-primary)]"
+          >
+            Questions
+          </h2>
 
-            {/* Options for radio/checkbox/dropdown */}
-            {(q.questionType === "radio" || q.questionType === "checkbox" || q.questionType === "dropdown") &&
-              q.options?.map((opt, i) => (
+          {survey.questions?.map((q, index) => (
+            <div
+              key={index}
+              className="mb-6 border-b border-[var(--border)] pb-4"
+            >
+              <label className="block mb-2">
+                <span className="font-semibold text-[var(--text-primary)]">
+                  Question {index + 1}
+                </span>
                 <input
-                  key={i}
                   type="text"
-                  value={opt}
-                  onChange={(e) => {
-                    const newOptions = [...q.options];
-                    newOptions[i] = e.target.value;
-                    handleQuestionChange(index, "options", newOptions);
-                  }}
-                  className="w-full border p-2 rounded mb-1"
-                  placeholder={`Option ${i + 1}`}
+                  value={q.questionText}
+                  onChange={(e) =>
+                    handleQuestionChange(
+                      index,
+                      "questionText",
+                      e.target.value
+                    )
+                  }
+                  className="w-full border border-[var(--border)] p-2 rounded mt-1
+                             bg-[var(--bg-secondary)] text-[var(--text-primary)]
+                             focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                  aria-label={`Edit text for question ${index + 1}`}
                 />
-              ))}
-          </div>
-        ))}
+              </label>
 
-        {/* Submit button */}
+              {(q.questionType === "radio" ||
+                q.questionType === "checkbox" ||
+                q.questionType === "dropdown") &&
+                q.options?.map((opt, i) => (
+                  <label key={i} className="block mb-2">
+                    <span className="sr-only">
+                      Option {i + 1} for Question {index + 1}
+                    </span>
+                    <input
+                      type="text"
+                      value={opt}
+                      onChange={(e) => {
+                        const newOptions = [...q.options];
+                        newOptions[i] = e.target.value;
+                        handleQuestionChange(index, "options", newOptions);
+                      }}
+                      className="w-full border border-[var(--border)] p-2 rounded
+                                 bg-[var(--bg-secondary)] text-[var(--text-primary)]
+                                 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                      aria-label={`Edit option ${i + 1} for question ${index + 1}`}
+                    />
+                  </label>
+                ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Save Button */}
         <button
+          type="button"
           onClick={handleUpdate}
-          className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="mt-6 px-6 py-3 rounded-lg font-semibold 
+                     bg-[var(--primary)] text-[var(--text-on-primary)]
+                     focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)]
+                     transition active:scale-95"
+          aria-label="Save survey changes"
         >
           Save Changes
         </button>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

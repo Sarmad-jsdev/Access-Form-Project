@@ -21,22 +21,24 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-[var(--bg-primary)] text-[var(--text-secondary)] transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col md:flex-row md:items-start gap-12 ">
-
+    <footer
+      className="bg-[var(--bg-primary)] text-[var(--text-secondary)] transition-colors duration-300"
+      role="contentinfo"
+      aria-label="Footer"
+    >
+      <div className="max-w-7xl mx-auto px-6 py-20 flex flex-col md:flex-row md:items-start gap-12">
         {/* Logo Section */}
         <div className="md:w-1/3">
           <Link
             to="/"
-            className="flex items-center gap-3 text-[var(--text-primary)]"
+            className="flex items-center gap-3 text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded-sm"
           >
-            {/* Logo Image and Text */}
-              <img
-                src={assets.logo}
-                alt="AccessForm Logo"
-                className="w-10 h-10 object-contain"
-                loading="lazy"
-              />  
+            <img
+              src={assets.logo}
+              alt="AccessForm Logo"
+              className="w-10 h-10 object-contain"
+              loading="lazy"
+            />
             <span className="text-xl font-bold tracking-tight">
               AccessForm
             </span>
@@ -48,7 +50,7 @@ const Footer = () => {
         </div>
 
         {/* Links Section */}
-        <div className="flex flex-1 flex-wrap gap-12">
+        <nav aria-label="Footer Navigation" className="flex flex-1 flex-wrap gap-12">
           {footerData.map((category, index) => (
             <div key={index}>
               <h2 className="text-sm font-bold tracking-wider text-[var(--text-primary)] mb-4">
@@ -69,7 +71,7 @@ const Footer = () => {
               </ul>
             </div>
           ))}
-        </div>
+        </nav>
       </div>
 
       {/* Bottom Bar */}
@@ -82,6 +84,6 @@ const Footer = () => {
       </div>
     </footer>
   );
-}
+};
 
 export default Footer;

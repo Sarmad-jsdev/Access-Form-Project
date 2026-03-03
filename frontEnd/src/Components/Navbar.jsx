@@ -8,24 +8,21 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false); // Mobile menu toggle
   const navigate = useNavigate();
 
-
-  // Determine dashboard path based on user role
   const getDashboardPath = () => {
-  if (!user) return "/";
+    if (!user) return "/";
 
-  switch (user.role) {
-    case "admin":
-      return "/Admindashboard";
-    case "creator":
-      return "/creator-dashboard";
-    case "respondent":
-      return "/Respondent";
-    default:
-      return "/";
-  }
-};
+    switch (user.role) {
+      case "admin":
+        return "/Admindashboard";
+      case "creator":
+        return "/creator-dashboard";
+      case "respondent":
+        return "/Respondent";
+      default:
+        return "/";
+    }
+  };
 
-  // Navigation items
   const publicNav = [
     { name: "Home", path: "/" },
     { name: "About Us", path: "/about" },
@@ -40,7 +37,7 @@ const Navbar = () => {
   ];
 
   const handleLogout = async () => {
-    await logout(); // AuthContext logout handles cookie clearing
+    await logout();
     navigate("/login", { replace: true });
   };
 
@@ -50,25 +47,30 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center cursor-pointer">
-            <Link to="/" className="flex items-center text-[var(--text-primary)]">
-              <img src={assets.logo} alt="Logo" className="h-10 w-auto" />
+            <Link
+              to="/"
+              className="flex items-center text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded-sm"
+            >
+              <img src={assets.logo} alt="AccessForm Logo" className="h-10 w-auto" />
               <span className="ml-2 text-lg font-bold">Access Form</span>
             </Link>
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-4">
-            <nav className="flex items-center gap-2">
-              {(user ? userNav : publicNav).map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className="text-[var(--text-primary)] hover:text-[var(--primary)] px-2 py-1"
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
+          <nav
+            className="hidden md:flex items-center gap-4"
+            role="navigation"
+            aria-label="Main navigation"
+          >
+            {(user ? userNav : publicNav).map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className="text-[var(--text-primary)] hover:text-[var(--primary)] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded-sm"
+              >
+                {item.name}
+              </Link>
+            ))}
 
             {/* Auth Buttons */}
             {user ? (
@@ -78,7 +80,7 @@ const Navbar = () => {
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--text-on-primary)]"
+                  className="rounded-lg bg-[var(--primary)] text-[var(--text-on-primary)] px-5 py-2.5 text-sm font-semibold  focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
                 >
                   Log Out
                 </button>
@@ -87,25 +89,30 @@ const Navbar = () => {
               <div className="flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--text-on-primary)]"
+                  className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--text-on-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] text-center"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="rounded-lg border border-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--primary)]"
+                  className="rounded-lg border border-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] text-center"
                 >
                   Register
                 </Link>
               </div>
             )}
-          </div>
+          </nav>
 
           {/* Mobile Toggle */}
-          <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden p-2 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded-sm"
+            aria-label={isOpen ? "Close mobile menu" : "Open mobile menu"}
+            aria-expanded={isOpen}
+          >
             <img
               src={isOpen ? assets.cross : assets.menu}
-              alt="menu"
+              alt={isOpen ? "Close menu icon" : "Open menu icon"}
               className="h-5 w-5 invert-[.5]"
             />
           </button>
@@ -113,19 +120,21 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden mt-4 space-y-4 pb-4 border-t border-[var(--border-color)] pt-4">
-            <nav className="flex flex-col gap-2">
-              {(user ? userNav : publicNav).map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  onClick={() => setIsOpen(false)}
-                  className="text-[var(--text-primary)] hover:text-[var(--primary)] px-2 py-1"
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
+          <nav
+            className="md:hidden mt-4 space-y-4 pb-4 border-t border-[var(--border-color)] pt-4"
+            role="navigation"
+            aria-label="Mobile navigation"
+          >
+            {(user ? userNav : publicNav).map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                onClick={() => setIsOpen(false)}
+                className="text-[var(--text-primary)] hover:text-[var(--primary)] px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded-sm"
+              >
+                {item.name}
+              </Link>
+            ))}
 
             {/* Mobile Auth Buttons */}
             <div className="flex flex-col gap-2 pt-4">
@@ -135,7 +144,7 @@ const Navbar = () => {
                     handleLogout();
                     setIsOpen(false);
                   }}
-                  className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--text-on-primary)]"
+                  className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--text-on-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
                 >
                   Log Out
                 </button>
@@ -144,21 +153,21 @@ const Navbar = () => {
                   <Link
                     to="/login"
                     onClick={() => setIsOpen(false)}
-                    className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--text-on-primary)] text-center"
+                    className="rounded-lg bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--text-on-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] text-center"
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
                     onClick={() => setIsOpen(false)}
-                    className="rounded-lg border border-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--primary)] text-center"
+                    className="rounded-lg border border-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--primary)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] text-center"
                   >
                     Register
                   </Link>
                 </>
               )}
             </div>
-          </div>
+          </nav>
         )}
       </div>
     </header>

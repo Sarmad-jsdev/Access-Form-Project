@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axiosInstance from "../axiosConfig"; // Use the configured axios instance
+import axiosInstance from "../axiosConfig";
 import { PlusCircle, Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -12,46 +12,41 @@ const CreateForm = () => {
   const [questions, setQuestions] = useState([]);
   const [previewMode, setPreviewMode] = useState(false);
 
-  // Add New Question
+  // Add new question
   const addQuestion = () => {
     setQuestions([
       ...questions,
-      {
-        questionText: "",
-        questionType: "text",
-        options: [],
-      },
+      { questionText: "", questionType: "text", options: [] },
     ]);
   };
 
-  // Delete Question
+  // Delete question
   const deleteQuestion = (index) => {
-    const updated = [...questions];
-    updated.splice(index, 1);
-    setQuestions(updated);
+    setQuestions(questions.filter((_, i) => i !== index));
   };
 
-  // Handle Question Change
+  // Handle question change
   const handleQuestionChange = (index, field, value) => {
     const updated = [...questions];
     updated[index][field] = value;
     setQuestions(updated);
   };
 
-  // Add Option
+  // Add option
   const addOption = (index) => {
     const updated = [...questions];
     updated[index].options.push("");
     setQuestions(updated);
   };
 
+  // Handle option change
   const handleOptionChange = (qIndex, oIndex, value) => {
     const updated = [...questions];
     updated[qIndex].options[oIndex] = value;
     setQuestions(updated);
   };
 
-  // Submit Form
+  // Submit form
   const handleSubmit = async () => {
     try {
       await axiosInstance.post(
@@ -59,7 +54,6 @@ const CreateForm = () => {
         { title, description, questions },
         { withCredentials: true }
       );
-
       alert("Form created successfully!");
       navigate("/creator-dashboard");
     } catch (err) {
@@ -69,107 +63,157 @@ const CreateForm = () => {
 
   return (
     <div className="min-h-screen p-8 bg-[var(--bg-secondary)]">
-      <h1 className="text-3xl font-bold mb-6">Create New Form</h1>
+      <h1 className="text-3xl font-bold mb-6 text-[var(--text-primary)]">
+        Create New Form
+      </h1>
 
       {/* Form Settings */}
-      <div className="bg-white p-6 rounded-xl shadow mb-6">
-        <input
-          type="text"
-          placeholder="Form Title"
-          className="w-full border p-3 rounded mb-4"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
+      <section
+        className="bg-[var(--bg-primary)] p-6 rounded-xl shadow mb-6"
+        aria-labelledby="form-settings-header"
+      >
+        <h2 id="form-settings-header" className="sr-only">
+          Form Settings
+        </h2>
 
-        <textarea
-          placeholder="Form Description"
-          className="w-full border p-3 rounded"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
-
-      {/* Questions Section */}
-      {questions.map((q, index) => (
-        <div key={index} className="bg-white p-6 rounded-xl shadow mb-4">
+        <label className="block mb-3 font-semibold text-[var(--text-primary)]">
+          Form Title
           <input
             type="text"
-            placeholder="Question text"
-            className="w-full border p-2 rounded mb-3"
-            value={q.questionText}
-            onChange={(e) =>
-              handleQuestionChange(index, "questionText", e.target.value)
-            }
+            placeholder="Form Title"
+            value={title}
+            required
+            onChange={(e) => setTitle(e.target.value)}
+            aria-required="true"
+            className="w-full border border-[var(--border)] p-3 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
           />
+        </label>
 
-          <select
-            className="border p-2 rounded mb-3"
-            value={q.questionType}
-            onChange={(e) =>
-              handleQuestionChange(index, "questionType", e.target.value)
-            }
+        <label className="block font-semibold text-[var(--text-primary)]">
+          Form Description
+          <textarea
+            placeholder="Form Description"
+            value={description}
+            required
+            onChange={(e) => setDescription(e.target.value)}
+            aria-required="true"
+            className="w-full border border-[var(--border)] p-3 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+          />
+        </label>
+      </section>
+
+      {/* Questions Section */}
+      <section aria-labelledby="questions-header">
+        <h2 id="questions-header" className="sr-only">
+          Questions
+        </h2>
+
+        {questions.map((q, index) => (
+          <div
+            key={index}
+            className="bg-[var(--bg-primary)] p-6 rounded-xl shadow mb-4"
           >
-            <option value="text">Text</option>
-            <option value="email">Email</option>
-            <option value="number">Number</option>
-            <option value="radio">Radio</option>
-            <option value="checkbox">Checkbox</option>
-            <option value="dropdown">Dropdown</option>
-          </select>
+            <label className="block mb-2 font-semibold text-[var(--text-primary)]">
+              Question Text
+              <input
+                type="text"
+                placeholder="Question text"
+                value={q.questionText}
+                onChange={(e) =>
+                  handleQuestionChange(index, "questionText", e.target.value)
+                }
+                aria-required="true"
+                required
+                className="w-full border border-[var(--border)] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+              />
+            </label>
 
-          {(q.questionType === "radio" ||
-            q.questionType === "checkbox" ||
-            q.questionType === "dropdown") && (
-            <div>
-              {q.options.map((opt, i) => (
-                <input
-                  key={i}
-                  type="text"
-                  placeholder="Option"
-                  className="w-full border p-2 rounded mb-2"
-                  value={opt}
-                  onChange={(e) =>
-                    handleOptionChange(index, i, e.target.value)
-                  }
-                />
-              ))}
-
-              <button
-                onClick={() => addOption(index)}
-                className="text-blue-600 text-sm"
+            <label className="block mb-3 font-semibold text-[var(--text-primary)]">
+              Question Type
+              <select
+                value={q.questionType}
+                onChange={(e) =>
+                  handleQuestionChange(index, "questionType", e.target.value)
+                }
+                className="w-full border border-[var(--border)] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                aria-label={`Select type for question ${index + 1}`}
               >
-                + Add Option
-              </button>
-            </div>
-          )}
+                <option value="text">Text</option>
+                <option value="email">Email</option>
+                <option value="number">Number</option>
+                <option value="radio">Radio</option>
+                <option value="checkbox">Checkbox</option>
+                <option value="dropdown">Dropdown</option>
+              </select>
+            </label>
 
-          <button
-            onClick={() => deleteQuestion(index)}
-            className="text-red-600 mt-3 flex items-center gap-2"
-          >
-            <Trash2 size={16} /> Delete Question
-          </button>
-        </div>
-      ))}
+            {(q.questionType === "radio" ||
+              q.questionType === "checkbox" ||
+              q.questionType === "dropdown") && (
+              <div>
+                {q.options.map((opt, i) => (
+                  <label key={i} className="block mb-2">
+                    <input
+                      type="text"
+                      placeholder="Option"
+                      required
+                      value={opt}
+                      onChange={(e) =>
+                        handleOptionChange(index, i, e.target.value)
+                      }
+                      aria-label={`Option ${i + 1} for question ${index + 1}`}
+                      className="w-full border border-[var(--border)] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                    />
+                  </label>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => addOption(index)}
+                  className="text-blue-600 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded inline-flex items-center gap-1"
+                  aria-label={`Add option to question ${index + 1}`}
+                >
+                  <PlusCircle size={16} /> Add Option
+                </button>
+              </div>
+            )}
 
-      <button
-        onClick={addQuestion}
-        className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-      >
-        <PlusCircle size={18} /> Add Question
-      </button>
+            <button
+              type="button"
+              onClick={() => deleteQuestion(index)}
+              className="text-red-600 mt-3 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded"
+              aria-label={`Delete question ${index + 1}`}
+            >
+              <Trash2 size={16} /> Delete Question
+            </button>
+          </div>
+        ))}
 
-      <div className="mt-6 flex gap-4">
         <button
+          type="button"
+          onClick={addQuestion}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+          aria-label="Add new question"
+        >
+          <PlusCircle size={18} /> Add Question
+        </button>
+      </section>
+
+      {/* Actions */}
+      <div className="mt-6 flex gap-4 flex-wrap">
+        <button
+          type="button"
           onClick={handleSubmit}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg"
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-all"
+          aria-label="Save form"
         >
           Save Form
         </button>
 
         <button
+          type="button"
           onClick={() => setPreviewMode(true)}
-          className="bg-gray-700 text-white px-6 py-2 rounded-lg flex items-center gap-2"
+          className="bg-gray-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-all"
+          aria-label="Preview form"
         >
           <Eye size={16} /> Preview
         </button>

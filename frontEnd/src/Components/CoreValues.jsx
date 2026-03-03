@@ -6,31 +6,37 @@ export default function CoreValues() {
       title: "Empathy First",
       description:
         "We don’t just write code — we focus on understanding and improving the user’s experience.",
-      icon: <Heart className="w-6 h-6" />,
+      icon: <Heart aria-hidden="true" className="w-6 h-6" />, // decorative icon
     },
     {
       title: "Simple for Everyone",
       description:
         "Accessibility should not be complicated. We make it as easy as drag-and-drop.",
-      icon: <Sparkles className="w-6 h-6" />,
+      icon: <Sparkles aria-hidden="true" className="w-6 h-6" />,
     },
     {
       title: "High Standards",
       description:
         "We follow WCAG 2.1 guidelines to ensure your product meets both legal and ethical standards.",
-      icon: <ShieldCheck className="w-6 h-6" />,
+      icon: <ShieldCheck aria-hidden="true" className="w-6 h-6" />,
     },
   ];
 
   return (
-    <section className="py-24 px-6 lg:px-16 bg-[var(--bg-primary)]  text-[var(--text-secondary)] transition-colors duration-300 border-b border-[var(--border-color)] shadow-sm">
+    <section
+      className="py-24 px-6 lg:px-16 bg-[var(--bg-primary)] text-[var(--text-secondary)] transition-colors duration-300 border-b border-[var(--border-color)] shadow-sm"
+      aria-labelledby="core-values-heading"
+    >
       <div className="max-w-6xl mx-auto text-center">
         {/* Section Heading */}
-        <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
+        <h2
+          id="core-values-heading"
+          className="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]"
+        >
           Our Core Values
         </h2>
         <p className="mt-4 text-[var(--text-secondary)] max-w-2xl mx-auto">
-          Accessibility sirf feature nahi — hamara mission hai.
+          Accessibility is not just a feature — it’s our mission. We are committed to making the web inclusive for everyone, regardless of their abilities.
         </p>
 
         {/* Cards */}
@@ -38,26 +44,33 @@ export default function CoreValues() {
           {values.map((value, index) => (
             <div
               key={index}
+              tabIndex={0} // make card focusable via keyboard
+              role="region"
+              aria-labelledby={`core-value-title-${index}`}
               className="group p-8 rounded-2xl 
-              bg-[var(--bg-secondary)] 
-              border border-[var(--border)] 
-              shadow-[var(--card-shadow)]
-              hover:-translate-y-2 
-              hover:shadow-xl 
-              transition-all duration-300"
+                bg-[var(--bg-secondary)] 
+                border border-[var(--border)] 
+                shadow-[var(--card-shadow)]
+                hover:-translate-y-2 
+                hover:shadow-xl 
+                focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)]
+                transition-all duration-300"
             >
               {/* Icon */}
               <div
                 className="w-12 h-12 flex items-center justify-center 
-                rounded-full mb-6 mx-auto 
-                bg-[var(--primary)]/10 
-                text-[var(--primary)]"
+                  rounded-full mb-6 mx-auto 
+                  bg-[var(--primary)]/10 
+                  text-[var(--primary)]"
               >
                 {value.icon}
               </div>
 
               {/* Title */}
-              <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-3">
+              <h3
+                id={`core-value-title-${index}`}
+                className="text-xl font-semibold text-[var(--text-primary)] mb-3"
+              >
                 {value.title}
               </h3>
 
