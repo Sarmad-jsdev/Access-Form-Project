@@ -15,9 +15,10 @@ const SurveyPage = () => {
   useEffect(() => {
     const fetchSurvey = async () => {
       try {
-        const res = await axiosInstance.get(`/api/creator/survey/${id}`);
+        const res = await axiosInstance.get(`/api/respondent/survey/${id}/fill`);
         setSurvey(res.data);
 
+        // Check if user has already submitted response to this survey
         if (user) {
           const responsesRes = await axiosInstance.get(`/api/respondent/my-responses/${id}`);
           setAlreadySubmitted(Boolean(responsesRes.data?.submitted));
@@ -42,6 +43,7 @@ const SurveyPage = () => {
 
   if (loading || !user || !survey) return <p className="text-center mt-8">Loading survey...</p>;
 
+  
   if (survey.creator === user?.id && user.role === "creator") {
     return <p className="text-center mt-8">Creators cannot fill their own survey.</p>;
   }
@@ -58,12 +60,12 @@ const SurveyPage = () => {
     e.preventDefault();
 
     const formattedAnswers = normalizedQuestions.map((q) => ({
-      questionText: q.questionText,
+      question: q.questionText,
       answer: answers[q._id] || (q.resolvedType === "checkbox" ? [] : ""),
     }));
 
     try {
-      await axiosInstance.post(`/api/respondent/submit-response/${id}`, {
+      await axiosInstance.post(`/api/respondent/survey/${id}/submit`, {
         answers: formattedAnswers,
       });
       alert("Survey submitted successfully!");
@@ -133,7 +135,6 @@ const SurveyPage = () => {
                 required
               />
             )}
-            
 
             {(q.resolvedType === "radio" || q.resolvedType === "dropdown") &&
               q.options?.map((opt, idx) => (
@@ -167,7 +168,6 @@ const SurveyPage = () => {
                         if (e.target.checked) {
                           handleChange(q._id, [...prev, opt]);
                         } else {
-                
                           handleChange(
                             q._id,
                             prev.filter((x) => x !== opt)

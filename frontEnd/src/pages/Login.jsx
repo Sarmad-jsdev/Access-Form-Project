@@ -64,7 +64,6 @@ const Login = () => {
               Welcome Back
             </h1>
             <p className="text-[var(--text-secondary)]">
-              Login to manage your accessible surveys.
               {shouldShowSurveyLoginMessage
                 ? "Login to fill and submit this form."
                 : "Login to manage your accessible surveys."}
