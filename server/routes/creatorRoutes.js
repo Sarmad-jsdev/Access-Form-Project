@@ -125,18 +125,40 @@ router.get("/survey/:id", authMiddleware, async (req, res) => {
 // ✅ Get survey analytics
 router.get("/survey-analytics/:id", authMiddleware, async (req, res) => {
   try {
+
+    if (req.user.role !== "creator") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     const survey = await Survey.findById(req.params.id);
 
     if (!survey) {
       return res.status(404).json({ message: "Survey not found" });
     }
 
-    const responses = await Response.find({ survey: survey._id });
+    if (survey.creator.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const responses = await Response.find({ survey: survey._id })
+      .populate("respondent", "email name")
+      .lean();
+
+    const responsesWithQuestionText = responses.map((resp) => ({
+      ...resp,
+      respondentEmail: resp.respondent?.email || "Unknown",
+      respondentName: resp.respondent?.name || "Unknown",
+      answers: (resp.answers || []).map((ans) => ({
+        ...ans,
+        questionText: ans.questionText || ans.question || "",
+      })),
+    }));
+
 
     res.json({
       surveyTitle: survey.title,
       totalResponses: responses.length,
-      responses,
+      responses: responsesWithQuestionText,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });

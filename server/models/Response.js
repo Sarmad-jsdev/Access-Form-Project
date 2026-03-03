@@ -13,7 +13,9 @@ const responseSchema = new mongoose.Schema({
   },
   answers: [
     {
-      question: { type: String, required: true }, // 🔥 TEXT
+      questionId: { type: String },
+      questionText: { type: String },
+      question: { type: String, required: true }, // backwards compatible text field
       answer: { type: mongoose.Schema.Types.Mixed, required: true },
     },
   ],

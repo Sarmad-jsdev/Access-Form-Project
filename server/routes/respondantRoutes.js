@@ -100,12 +100,25 @@ router.post("/survey/:id/submit", authMiddleware, async (req, res) => {
       return res.status(403).json({ message: "You have already submitted this survey" });
     }
 
-    const { answers } = req.body; // array of { questionId, answer }
+    const { answers } = req.body; // array of { questionId, questionText/question, answer }
+
+    const normalizedAnswers = Array.isArray(answers)
+      ? answers.map((item) => ({
+          questionId: item.questionId || undefined,
+          questionText: item.questionText || item.question || "",
+          question: item.question || item.questionText || "",
+          answer: item.answer,
+        }))
+      : [];
+
+    if (!normalizedAnswers.length) {
+      return res.status(400).json({ message: "Answers are required" });
+    }
 
     const response = await Response.create({
       survey: survey._id,
       respondent: req.user.id,
-      answers,
+      answers: normalizedAnswers,
     });
 
     res.status(201).json({ message: "Response submitted successfully", response });
