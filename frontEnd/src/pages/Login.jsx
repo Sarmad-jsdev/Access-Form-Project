@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 
 const Login = () => {
-  const { login, user } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -13,6 +13,15 @@ const Login = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const redirectPath = searchParams.get("redirect") || "/dashboard";
+
+  // Check if the redirect path is a survey link
+  const shouldShowSurveyLoginMessage = redirectPath.startsWith("/survey/");
+
+  useEffect(() => {
+    if (shouldShowSurveyLoginMessage) {
+      alert("Please login to fill the form.");
+    }
+  }, [shouldShowSurveyLoginMessage]);
 
   const handleLogin = async (e) => {
   e.preventDefault();
@@ -56,6 +65,9 @@ const Login = () => {
             </h1>
             <p className="text-[var(--text-secondary)]">
               Login to manage your accessible surveys.
+              {shouldShowSurveyLoginMessage
+                ? "Login to fill and submit this form."
+                : "Login to manage your accessible surveys."}
             </p>
           </div>
 
@@ -131,7 +143,10 @@ const Login = () => {
           {/* Footer */}
           <p className="mt-8 text-center text-[var(--text-secondary)] text-sm">
             Don't have an account?{" "}
-            <Link to="/register" className="text-[var(--primary)] font-bold hover:underline">
+            <Link
+              to={`/register?redirect=${encodeURIComponent(redirectPath)}`}
+              className="text-[var(--primary)] font-bold hover:underline"
+            >
               Create one for free
             </Link>
           </p>

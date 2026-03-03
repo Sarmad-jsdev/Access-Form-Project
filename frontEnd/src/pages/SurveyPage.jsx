@@ -1,27 +1,16 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useContext, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import axiosInstance from "../axiosConfig";
 import { AuthContext } from "../context/AuthContext";
 
 const SurveyPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { user, loading } = useContext(AuthContext);
 
   const [survey, setSurvey] = useState(null);
   const [answers, setAnswers] = useState({});
   const [alreadySubmitted, setAlreadySubmitted] = useState(false);
-  const [shareLink, setShareLink] = useState(window.location.href);
-
-  useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        // Not logged in → redirect to login with redirect param
-        navigate(`/login?redirect=/survey/${id}`, { replace: true });
-        return;
-      }
-    }
-  }, [user, loading, navigate, id]);
+  const [shareLink] = useState(window.location.href);
 
   useEffect(() => {
     const fetchSurvey = async () => {
@@ -29,22 +18,30 @@ const SurveyPage = () => {
         const res = await axiosInstance.get(`/api/creator/survey/${id}`);
         setSurvey(res.data);
 
-        // Check if current user already submitted
         if (user) {
           const responsesRes = await axiosInstance.get(`/api/respondent/my-responses/${id}`);
-          setAlreadySubmitted(responsesRes.data.submitted); // expects { submitted: true/false }
+          setAlreadySubmitted(Boolean(responsesRes.data?.submitted));
         }
       } catch (err) {
         alert(err.response?.data?.message || "Failed to load survey");
       }
     };
 
-    if (user) fetchSurvey();
-  }, [user, id]);
+    if (!loading && user) fetchSurvey();
+  }, [user, loading, id]);
 
-  if (!survey) return <p className="text-center mt-8">Loading survey...</p>;
 
-  // Prevent creator from filling their own survey
+  const normalizedQuestions = useMemo(
+    () =>
+      (survey?.questions || []).map((q) => ({
+        ...q,
+        resolvedType: q.questionType || q.type || "text",
+      })),
+    [survey]
+  );
+
+  if (loading || !user || !survey) return <p className="text-center mt-8">Loading survey...</p>;
+
   if (survey.creator === user?.id && user.role === "creator") {
     return <p className="text-center mt-8">Creators cannot fill their own survey.</p>;
   }
@@ -54,14 +51,21 @@ const SurveyPage = () => {
   }
 
   const handleChange = (questionId, value) => {
-    setAnswers({ ...answers, [questionId]: value });
+    setAnswers((prev) => ({ ...prev, [questionId]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const formattedAnswers = normalizedQuestions.map((q) => ({
+      questionText: q.questionText,
+      answer: answers[q._id] || (q.resolvedType === "checkbox" ? [] : ""),
+    }));
+
     try {
-      await axiosInstance.post(`/api/respondent/submit-response/${id}`, { answers });
+      await axiosInstance.post(`/api/respondent/submit-response/${id}`, {
+        answers: formattedAnswers,
+      });
       alert("Survey submitted successfully!");
       setAlreadySubmitted(true);
     } catch (err) {
@@ -87,10 +91,11 @@ const SurveyPage = () => {
       </button>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {survey.questions.map((q) => (
+        {normalizedQuestions.map((q) => (
           <div key={q._id}>
             <label className="font-semibold block mb-1">{q.questionText}</label>
-            {q.type === "text" && (
+
+            {q.resolvedType === "text" && (
               <input
                 type="text"
                 value={answers[q._id] || ""}
@@ -99,7 +104,28 @@ const SurveyPage = () => {
                 required
               />
             )}
-            {q.type === "textarea" && (
+
+            {q.resolvedType === "email" && (
+              <input
+                type="email"
+                value={answers[q._id] || ""}
+                onChange={(e) => handleChange(q._id, e.target.value)}
+                className="w-full p-2 border rounded"
+                required
+              />
+            )}
+
+            {q.resolvedType === "number" && (
+              <input
+                type="number"
+                value={answers[q._id] || ""}
+                onChange={(e) => handleChange(q._id, e.target.value)}
+                className="w-full p-2 border rounded"
+                required
+              />
+            )}
+
+            {q.resolvedType === "textarea" && (
               <textarea
                 value={answers[q._id] || ""}
                 onChange={(e) => handleChange(q._id, e.target.value)}
@@ -107,8 +133,10 @@ const SurveyPage = () => {
                 required
               />
             )}
-            {q.type === "radio" &&
-              q.options.map((opt, idx) => (
+            
+
+            {(q.resolvedType === "radio" || q.resolvedType === "dropdown") &&
+              q.options?.map((opt, idx) => (
                 <div key={idx}>
                   <label>
                     <input
@@ -123,8 +151,10 @@ const SurveyPage = () => {
                   </label>
                 </div>
               ))}
-            {q.type === "checkbox" &&
-              q.options.map((opt, idx) => (
+
+
+            {q.resolvedType === "checkbox" &&
+              q.options?.map((opt, idx) => (
                 <div key={idx}>
                   <label>
                     <input
@@ -137,7 +167,11 @@ const SurveyPage = () => {
                         if (e.target.checked) {
                           handleChange(q._id, [...prev, opt]);
                         } else {
-                          handleChange(q._id, prev.filter((x) => x !== opt));
+                
+                          handleChange(
+                            q._id,
+                            prev.filter((x) => x !== opt)
+                          );
                         }
                       }}
                     />
