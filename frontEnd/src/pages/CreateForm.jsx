@@ -135,7 +135,7 @@ const CreateForm = () => {
                 onChange={(e) =>
                   handleQuestionChange(index, "questionType", e.target.value)
                 }
-                className="w-full border border-[var(--border)] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+                className="w-full border border-[var(--border)] p-2 text-[var(--text-primary)] bg-[var(--bg-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
                 aria-label={`Select type for question ${index + 1}`}
               >
                 <option value="text">Text</option>
