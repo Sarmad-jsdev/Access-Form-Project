@@ -38,7 +38,7 @@ The frontend is built with HTML, CSS, and JavaScript, while the backend handles 
 
 ## 🌐 Live Demo
 
-📍 **Frontend Live Link:** [https://access-form-project.vercel.app](https://accessform-chi.vercel.app/)  
+📍 **Frontend Live Link:** https://accessform-chi.vercel.app
 
 ---
 
