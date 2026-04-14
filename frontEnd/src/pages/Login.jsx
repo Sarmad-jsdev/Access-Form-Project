@@ -16,18 +16,17 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [infoMessage, setInfoMessage] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ ADDED
 
   const headingRef = useRef(null);
   const errorRef = useRef(null);
 
-  // Show accessible info message instead of alert
   useEffect(() => {
     if (shouldShowSurveyLoginMessage) {
       setInfoMessage("Please login to fill and submit this form.");
     }
   }, [shouldShowSurveyLoginMessage]);
 
-  // Focus page heading on mount
   useEffect(() => {
     if (headingRef.current) {
       headingRef.current.focus();
@@ -39,6 +38,8 @@ const Login = () => {
     setErrorMessage("");
 
     try {
+      setLoading(true); // ✅ START LOADING
+
       const loggedInUser = await login(email, password);
 
       if (redirectPath && redirectPath !== "/dashboard") {
@@ -60,10 +61,11 @@ const Login = () => {
         err.response?.data?.message || "Login failed. Please try again.";
       setErrorMessage(message);
 
-      // Move focus to error for screen reader
       if (errorRef.current) {
         errorRef.current.focus();
       }
+    } finally {
+      setLoading(false); // ✅ STOP LOADING
     }
   };
 
@@ -75,7 +77,6 @@ const Login = () => {
       >
         <div className="p-8">
 
-          {/* Heading */}
           <h1
             id="login-heading"
             ref={headingRef}
@@ -91,7 +92,6 @@ const Login = () => {
               : "Login to manage your accessible surveys."}
           </p>
 
-          {/* Accessible Info Message */}
           {infoMessage && (
             <div
               className="mb-4 p-3 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)]"
@@ -102,7 +102,6 @@ const Login = () => {
             </div>
           )}
 
-          {/* Error Message */}
           {errorMessage && (
             <div
               ref={errorRef}
@@ -115,10 +114,8 @@ const Login = () => {
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-6" noValidate>
 
-            {/* Email */}
             <div>
               <label
                 htmlFor="email"
@@ -128,10 +125,7 @@ const Login = () => {
               </label>
 
               <div className="relative">
-                <Mail
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-[var(--text-secondary)]"
-                  aria-hidden="true"
-                />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-[var(--text-secondary)]" />
 
                 <input
                   id="email"
@@ -140,13 +134,11 @@ const Login = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="  Enter your email"
                   required
-                  aria-required="true"
                   className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label
                 htmlFor="password"
@@ -156,10 +148,7 @@ const Login = () => {
               </label>
 
               <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-[var(--text-secondary)]"
-                  aria-hidden="true"
-                />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-[var(--text-secondary)]" />
 
                 <input
                   id="password"
@@ -168,52 +157,38 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  aria-required="true"
                   className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
                 />
 
-                {/* Accessible Toggle */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={
-                    showPassword
-                      ? "Hide password"
-                      : "Show password"
-                  }
-                  aria-pressed={showPassword}
-                  className="absolute right-3 top-1/2 -translate-y-1/2
-                  focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]
-                  rounded"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
-                  {showPassword ? (
-                    <EyeOff size={20} className="text-[var(--text-secondary)]" aria-hidden="true" />
-                  ) : (
-                    <Eye size={20} className="text-[var(--text-secondary)]" aria-hidden="true" />
-                  )}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
 
-            {/* Submit */}
+            {/* ✅ UPDATED BUTTON */}
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-[var(--primary)] text-[var(--text-on-primary)]
               py-3 rounded-lg font-bold flex items-center justify-center gap-2
               focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)]
-              active:scale-95 transition"
+              active:scale-95 transition disabled:opacity-60"
             >
-              Sign In
-              <ArrowRight size={20} aria-hidden="true" />
+              {loading ? "Signing In..." : "Sign In"}
+              <ArrowRight size={20} />
             </button>
           </form>
 
-          {/* Footer */}
           <p className="mt-8 text-center text-[var(--text-secondary)] text-sm">
             Don't have an account?{" "}
             <Link
               to={`/register?redirect=${encodeURIComponent(redirectPath)}`}
-              className="text-[var(--primary)] font-bold hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded"
+              className="text-[var(--primary)] font-bold hover:underline"
             >
               Create one for free
             </Link>
