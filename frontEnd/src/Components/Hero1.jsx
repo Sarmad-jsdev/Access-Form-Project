@@ -16,7 +16,7 @@ const Hero = () => {
             className="text-3xl sm:text-5xl lg:text-6xl font-bold text-[var(--text-primary)] leading-[1.2] mb-6"
           >
             We Believe Every <br className="hidden sm:block" />
-            <span className="text-[var(--primary)]">Voice</span> <br className="hidden sm:block" />
+            <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent">Voice</span> <br className="hidden sm:block" />
             Deserves to be Heard.
           </h1>
 
@@ -29,7 +29,11 @@ const Hero = () => {
             to="/Login"
             role="button"
             aria-label="Start building accessible surveys"
-            className="inline-flex bg-[var(--primary)] text-[var(--text-on-primary)] px-8 py-4 rounded-md font-semibold hover:bg-[var(--primary-dark)] shadow-md active:scale-95 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-all"
+            className="px-7 py-3 text-lg rounded-xl font-medium shadow-md transition-all duration-300"
+              style={{
+                background: "linear-gradient(135deg, var(--primary), var(--accent))",
+                color: "var(--text-on-primary)",
+              }}
           >
             Start Building Accessible Surveys
           </RouterLink>

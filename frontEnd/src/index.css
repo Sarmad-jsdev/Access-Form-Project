@@ -17,36 +17,22 @@ html {
 }
 
 
-/* Autofill fix for Chrome */
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-textarea:-webkit-autofill,
-select:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0px 1000px var(--bg-primary) inset !important;
-  -webkit-text-fill-color: var(--text-primary) !important;
-  caret-color: var(--text-primary) !important;
-  transition: background-color 9999s ease-in-out 0s;
-}
-
-
-
 
 /* ==============================
    BASE COLORS
    ============================== */
 :root {
-  --bg-primary: #E1DFEA;
+  --bg-primary: #F1F5F9;      /* Cool Frost */
   --bg-secondary: #FFFFFF;
-  --text-primary: #0F172A;
-  --text-secondary: #334155;
-  --primary: #14B8A6;
-  --primary-dark: #0F766E;
-  --accent: #06B6D4;
-  --border: #E2E8F0;
-  --focus-ring: #2563EB;
-
-  --text-on-primary: #0F172A; 
+  --text-primary: #1E293B;
+  --text-secondary: #475569;
+  --primary: #0EA5E9;         /* Sky Blue */
+  --primary-dark: #0284C7;
+  --accent: #6366F1;          /* Indigo Accent */
+  --border: #CBD5E1;
+  --border-color: #1E293B;
+  --focus-ring: #38BDF8;
+  --text-on-primary: #FFFFFF;
 
   /* Button colors */
   --btn-delete: #DC2626;  /* Red delete button stays the same on all themes */
@@ -61,17 +47,17 @@ select:-webkit-autofill {
    DARK THEME
    ============================== */
 .dark {
-  --bg-primary: #0F172A;
-  --bg-secondary: #1E293B;
-  --text-primary: #F1F5F9;
-  --text-secondary: #CBD5E1;
-  --primary: #14B8A6;
-  --primary-dark: #0F766E;
-  --accent: #22D3EE;
-  --border: #334155;
-  --focus-ring: #2563EB;
-
-  --text-on-primary: #F1F5F9; 
+  --bg-primary: #0B0E14;      /* Obsidian Deep */
+  --bg-secondary: #151921;    /* Slightly lighter card background */
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --primary: #8B5CF6;         /* Electric Violet */
+  --primary-dark: #7C3AED;
+  --accent: #D946EF;          /* Fuchsia Glow */
+  --border: #1E293B;
+  --border-color: #e1e6ec;
+  --focus-ring: #A78BFA;
+  --text-on-primary: #FFFFFF; 
 }
 
 /* ==============================
@@ -86,6 +72,7 @@ select:-webkit-autofill {
   --primary-dark: #FFD700;      /* Darker highlight / hover */
   --accent: #00FFFF;            /* Accent / icons / shadows */
   --border: #FFFF00;            /* Borders for cards/tables */
+  --border-color: #e1e6ec;
   --focus-ring: #00FFFF;        /* Focus outlines */
 
   --text-on-primary: #000000;   /* Text on primary buttons */
@@ -96,16 +83,16 @@ select:-webkit-autofill {
    DYSLEXIA-FRIENDLY THEME
    ============================== */
 .dyslexia {
-  --bg-primary: #F7F3E8;      /* Off-white, low contrast background */
-  --bg-secondary: #FFFFFF;
-  --text-primary: #0F172A;
-  --text-secondary: #334155;
-  --primary: #0F766E;
-  --primary-dark: #0B4C3B;
-  --accent: #14B8A6;
-  --border: #E2E8F0;
-  --focus-ring: #2563EB;
-
-  --text-on-primary: #0F172A;
+  --bg-primary: #EFECE5;      /* Warm Sand (easy on eyes) */
+  --bg-secondary: #F9F8F6;
+  --text-primary: #2D332E;    /* Soft Dark Green instead of Black */
+  --text-secondary: #4A524C;
+  --primary: #5F7A61;         /* Muted Sage */
+  --primary-dark: #465C47;
+  --accent: #8DA48E;
+  --border: #D1CDC1;
+  --border-color: #e1e6ec;
+  --focus-ring: #5F7A61;
+  --text-on-primary: #FFFFFF;
   --font-family: var(--font-dyslexia);
 }

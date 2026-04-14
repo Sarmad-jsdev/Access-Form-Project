@@ -66,7 +66,7 @@ const FeaturesSection = () => {
                 {/* Title */}
                 <h2
                   id={`feature-title-${index}`}
-                  className="text-[var(--text-secondary)] text-lg font-medium mb-3"
+                  className="text-[var(--text-primary)] text-lg font-medium mb-3"
                 >
                   {feature.title}
                 </h2>

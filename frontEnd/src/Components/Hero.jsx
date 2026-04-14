@@ -4,43 +4,61 @@ import { Link as RouterLink } from "react-router-dom";
 
 const HeroSection = () => {
   return (
-    <section
-      className="body-font bg-[var(--bg-primary)] text-[var(--text-secondary)] transition-colors duration-300 border-b border-[var(--border-color)] shadow-sm"
-      aria-labelledby="hero-heading"
-    >
-      <div className="container-fluid mx-auto flex px-12 py-10 md:flex-row flex-col items-center">
-        {/* Left Text Content */}
-        <div className="lg:flex-grow md:w-1/2 lg:pr-18 md:pr-10 flex flex-col md:items-start md:text-left mb-4 sm:mb-0 items-center text-center">
-          <h1
-            id="hero-heading"
-            className="title-font sm:text-4xl text-3xl mb-4 font-medium text-[var(--text-primary)]"
-          >
-            Every Voice Matters. Build Surveys for Everyone.
+    <section className="relative overflow-hidden bg-[var(--bg-primary)] border-b border-[var(--border-color)] ">
+      
+      <div className="container mx-auto px-6 md:px-12 py-20 md:py-28 flex flex-col-reverse lg:flex-row items-center gap-12">
+
+        {/* 🔹 LEFT CONTENT */}
+        <div className="w-full lg:w-1/2 text-center lg:text-left">
+          
+          {/* Small Tag */}
+          <span className="inline-block mb-4 px-4 py-1 text-sm rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--primary)] font-medium">
+            🌍 Accessibility First Platform
+          </span>
+
+          {/* Heading */}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight text-[var(--text-primary)]">
+            Every Voice Matters.
+            <br />
+            <span className="bg-gradient-to-r from-[var(--primary)] to-[var(--accent)] bg-clip-text text-transparent">
+              Build Surveys for Everyone.
+            </span>
           </h1>
-          <p className="mb-8 leading-relaxed text-[var(--text-secondary)]">
-            Create WCAG-compliant surveys that empower people of all abilities to share their insights independently.
+
+          {/* Description */}
+          <p className="mt-6 text-lg text-[var(--text-secondary)] max-w-xl mx-auto lg:mx-0">
+            Create inclusive, WCAG-compliant surveys that empower every voice —
+            regardless of ability.
           </p>
 
-          {/* CTA Button */}
-          <RouterLink
-            to="/Login"
-            className="inline-flex text-[var(--text-on-primary)] bg-[var(--primary)] border-0 py-2 px-6 rounded text-lg font-medium focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] hover:bg-[var(--primary-dark)] transition-colors duration-200"
-            role="button"
-            aria-label="Start building accessible surveys for free"
-          >
-            Start Building for Free
-          </RouterLink>
+          {/* Buttons */}
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            
+            <RouterLink
+              to="/Login"
+              className="px-7 py-3 text-lg rounded-xl font-medium shadow-md transition-all duration-300"
+              style={{
+                background: "linear-gradient(135deg, var(--primary), var(--accent))",
+                color: "var(--text-on-primary)",
+              }}
+            >
+              Get Started
+            </RouterLink>
+          </div>
         </div>
 
-        {/* Right Image */}
-        <div className="w-full lg:w-1/2 flex justify-center items-center order-1 lg:order-2">
-          <div className="relative w-full max-w-[320px] sm:max-w-[450px] lg:max-w-full">
-            <img
-              src={assets.img1}
-              alt="Illustration showing a diverse team collaborating and analyzing survey results"
-              className="object-contain rounded-lg"
-            />
-          </div>
+        {/* 🔹 RIGHT ILLUSTRATION */}
+        <div className="w-full lg:w-1/2 flex justify-center">
+          <div className="relative">
+  
+  {/* Background Blob */}
+  <div className="absolute -z-10 w-[500px] h-[500px] bg-[var(--primary)] opacity-20 blur-[120px] rounded-full top-[-50px] right-[-50px]" />
+
+  <img
+    src={assets.img1}
+    className="relative w-full max-w-[500px] rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)] "
+  />
+</div>
         </div>
       </div>
     </section>

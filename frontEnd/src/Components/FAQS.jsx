@@ -71,7 +71,7 @@ const FAQ = () => {
                   aria-controls={panelId}
                   className="flex items-center justify-between w-full p-6 text-left focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded-2xl"
                 >
-                  <span className="font-semibold text-[var(--text-secondary)]">
+                  <span className="font-semibold text-[var(--text-primary)]">
                     {faq.question}
                   </span>
 

@@ -9,7 +9,7 @@ const ContactUs = () => {
 
   return (
     <section
-      className="bg-[var(--bg-primary)] min-h-screen py-16 px-6 transition-colors duration-300"
+      className="bg-[var(--bg-primary)] min-h-screen py-16 px-6 transition-colors duration-300 border-b border-[var(--border-color)] shadow-sm"
       aria-labelledby="contact-header"
     >
       <div className="container mx-auto max-w-6xl">

@@ -37,8 +37,8 @@ const Settings = () => {
   }, [fontSize, theme]);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] p-6 md:p-12 transition-colors duration-300">
-      <div className="max-w-3xl mx-auto bg-[var(--bg-secondary)] rounded-2xl shadow-[var(--card-shadow)] p-8 border border-[var(--border)]">
+    <div className="min-h-screen bg-[var(--bg-primary)] p-6 md:p-12 transition-colors duration-300 border border-[var(--border-color)] shadow-sm">
+      <div className="max-w-3xl mx-auto bg-[var(--bg-secondary)] rounded-2xl shadow-[var(--card-shadow)] p-8 ">
 
         <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-8 border-b border-[var(--border)] pb-4">
           Accessibility Settings
