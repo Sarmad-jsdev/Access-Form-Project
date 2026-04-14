@@ -10,7 +10,6 @@ const CreateForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState([]);
-  const [previewMode, setPreviewMode] = useState(false);
 
   // Add new question
   const addQuestion = () => {
@@ -49,10 +48,11 @@ const CreateForm = () => {
   // Submit form
   const handleSubmit = async () => {
     try {
-      await axiosInstance.post(
-        `${API_BASE_URL}/api/creator/create-survey`,
-        { title, description, questions },
-      );
+      await axiosInstance.post(`${API_BASE_URL}/api/creator/create-survey`, {
+        title,
+        description,
+        questions,
+      });
       alert("Form created successfully!");
       navigate("/creator-dashboard");
     } catch (err) {
@@ -206,15 +206,6 @@ const CreateForm = () => {
           aria-label="Save form"
         >
           Save Form
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setPreviewMode(true)}
-          className="bg-gray-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-all"
-          aria-label="Preview form"
-        >
-          <Eye size={16} /> Preview
         </button>
       </div>
     </div>
