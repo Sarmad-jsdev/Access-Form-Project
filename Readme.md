@@ -3,7 +3,7 @@
 A web application for collecting user access form data with frontend and backend support.  
 This project includes a frontend UI and a backend server for handling form submissions.
 
-👉 **Live Preview:** [(https://access-form-project.vercel.app)](https://accessform-chi.vercel.app/)
+👉 **Live Preview:** [[(https://access-form-project.vercel.app)](https://accessform-chi.vercel.app/)](https://accessform-chi.vercel.app/)
 
 ---
 
