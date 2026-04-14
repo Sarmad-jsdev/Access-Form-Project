@@ -31,6 +31,8 @@ export const loginUser = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
+  console.log("🔥 LOGIN ERROR FULL:", error);
+  console.log("STACK:", error.stack);
   }
 };
 

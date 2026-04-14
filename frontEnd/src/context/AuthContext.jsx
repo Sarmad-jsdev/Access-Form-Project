@@ -10,6 +10,14 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
   const fetchUser = async () => {
     try {
+      const token = localStorage.getItem("token");
+
+      // ✅ STOP if no token
+      if (!token) {
+        setUser(null);
+        return;
+      }
+
       const res = await axiosInstance.get("/api/auth/me");
       setUser(res.data);
     } catch (err) {

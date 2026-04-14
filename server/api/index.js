@@ -14,57 +14,58 @@ dotenv.config();
 
 const app = express();
 
-// ✅ Fix DB multiple connections (serverless)
+/* -------------------- DB CONNECTION (SAFE FOR VERCEL) -------------------- */
 let isConnected = false;
+
 const connectDBOnce = async () => {
   if (!isConnected) {
     await connectDB();
     isConnected = true;
   }
 };
+
 await connectDBOnce();
 
-// Trust proxy
+/* -------------------- PROXY -------------------- */
 app.set("trust proxy", 1);
 
-// CORS configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URL_PROD,
+];
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like Postman)
+    origin: function (origin, callback) {
+      // allow mobile apps / postman
       if (!origin) return callback(null, true);
 
-      // Allow localhost
-      if (origin.includes("localhost")) {
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      // Allow ALL vercel domains
-      if (origin.endsWith(".vercel.app")) {
-        return callback(null, true);
-      }
-
-      return callback(new Error("CORS not allowed"));
+      return callback(null, false);
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-
-// Handle preflight requests
-app.options("*", cors());
-
+/* -------------------- MIDDLEWARE -------------------- */
 app.use(express.json());
 
-// Routes
+/* -------------------- ROUTES -------------------- */
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/creator", creatorRoutes);
 app.use("/api/user", userRoutes);
-app.use("/api/respondent", respondentRoutes); // ✅ fixed name
+app.use("/api/respondent", respondentRoutes);
 
-app.get("/", (req, res) => res.send("API running"));
+/* -------------------- HEALTH CHECK -------------------- */
+app.get("/", (req, res) => {
+  res.send("API running 🚀");
+});
 
+/* -------------------- EXPORT FOR VERCEL -------------------- */
 export default app;
 export const handler = serverless(app);
