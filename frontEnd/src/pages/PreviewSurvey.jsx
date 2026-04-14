@@ -16,7 +16,7 @@ const PreviewSurvey = () => {
       try {
         const res = await axiosInstance.get(
           `${API_BASE_URL}/api/creator/survey/${id}`,
-          { withCredentials: true }
+          {}
         );
         setSurvey(res.data);
       } catch (error) {

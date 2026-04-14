@@ -26,7 +26,7 @@ const SurveyAnalytics = () => {
       try {
         const res = await axiosInstance.get(
           `${API_BASE_URL}/api/creator/survey-analytics/${id}`,
-          { withCredentials: true }
+          {}
         );
         setAnalytics(res.data);
       } catch (fetchError) {

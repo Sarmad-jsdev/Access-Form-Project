@@ -22,9 +22,7 @@ const CreatorDashboard = () => {
 
   const fetchSurveys = async () => {
     try {
-      const res = await axiosInstance.get(`${API_BASE_URL}/api/creator/my-surveys`, {
-        withCredentials: true,
-      });
+      const res = await axiosInstance.get(`${API_BASE_URL}/api/creator/my-surveys`, {});
       setSurveys(res.data.surveys);
       setStats(res.data.stats);
     } catch (err) {
@@ -39,9 +37,7 @@ const CreatorDashboard = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this survey?")) return;
     try {
-      await axiosInstance.delete(`${API_BASE_URL}/api/creator/delete-survey/${id}`, {
-        withCredentials: true,
-      });
+      await axiosInstance.delete(`${API_BASE_URL}/api/creator/delete-survey/${id}`, {});
       fetchSurveys();
     } catch (err) {
       console.error(err);

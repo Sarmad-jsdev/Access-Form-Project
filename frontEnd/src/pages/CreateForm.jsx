@@ -52,7 +52,6 @@ const CreateForm = () => {
       await axiosInstance.post(
         `${API_BASE_URL}/api/creator/create-survey`,
         { title, description, questions },
-        { withCredentials: true }
       );
       alert("Form created successfully!");
       navigate("/creator-dashboard");

@@ -17,7 +17,7 @@ const EditSurvey = () => {
       try {
         const res = await axiosInstance.get(
           `${API_BASE_URL}/api/creator/survey/${id}`,
-          { withCredentials: true }
+          {}
         );
         setSurvey(res.data);
       } catch (error) {
@@ -40,7 +40,7 @@ const EditSurvey = () => {
       await axiosInstance.put(
         `${API_BASE_URL}/api/creator/edit-survey/${id}`,
         survey,
-        { withCredentials: true }
+        {}
       );
       alert("Survey updated successfully!");
       navigate("/creator-dashboard");

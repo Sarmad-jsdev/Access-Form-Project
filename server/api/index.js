@@ -27,17 +27,33 @@ await connectDBOnce();
 // Trust proxy
 app.set("trust proxy", 1);
 
-// ✅ SIMPLE CORS (Bearer token, no cookies)
+// CORS configuration
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      /^https:\/\/[a-z0-9-]+\.vercel\.app$/,
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like Postman)
+      if (!origin) return callback(null, true);
+
+      // Allow localhost
+      if (origin.includes("localhost")) {
+        return callback(null, true);
+      }
+
+      // Allow ALL vercel domains
+      if (origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS not allowed"));
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+
+// Handle preflight requests
+app.options("*", cors());
 
 app.use(express.json());
 

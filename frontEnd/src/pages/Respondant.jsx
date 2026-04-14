@@ -25,7 +25,7 @@ const Respondent = () => {
       try {
         const res = await axiosInstance.get(
           `${API_BASE_URL}/api/respondent/active-surveys`,
-          { withCredentials: true }
+          {}
         );
         setSurveys(res.data);
       } catch (err) {
@@ -67,7 +67,7 @@ const Respondent = () => {
       await axiosInstance.post(
         `${API_BASE_URL}/api/respondent/submit-response/${selectedSurvey._id}`,
         { answers: formattedAnswers },
-        { withCredentials: true }
+        {}
       );
 
       setMessage("Response submitted successfully!");
