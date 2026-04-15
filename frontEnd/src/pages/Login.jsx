@@ -11,37 +11,74 @@ const Login = () => {
   const redirectPath = searchParams.get("redirect") || "/dashboard";
   const shouldShowSurveyLoginMessage = redirectPath.startsWith("/survey/");
 
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // UI state
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // API error
+  const [errors, setErrors] = useState({}); // field errors
   const [infoMessage, setInfoMessage] = useState("");
-  const [loading, setLoading] = useState(false); // ✅ ADDED
+  const [loading, setLoading] = useState(false);
 
   const headingRef = useRef(null);
   const errorRef = useRef(null);
 
+  // Show survey login message
   useEffect(() => {
     if (shouldShowSurveyLoginMessage) {
       setInfoMessage("Please login to fill and submit this form.");
     }
   }, [shouldShowSurveyLoginMessage]);
 
+  // Focus heading on load
   useEffect(() => {
     if (headingRef.current) {
       headingRef.current.focus();
     }
   }, []);
 
+  // ---------------- VALIDATION ----------------
+  const validate = () => {
+    const newErrors = {};
+
+    // Email validation
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    // Password validation
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 6) {
+      newErrors.password = "Minimum 6 characters required";
+    }
+
+    return newErrors;
+  };
+
+  // ---------------- HANDLE LOGIN ----------------
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
 
+    const validationErrors = validate();
+
+    // Stop if validation fails
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
     try {
-      setLoading(true); // ✅ START LOADING
+      setLoading(true);
 
       const loggedInUser = await login(email, password);
 
+      // Redirect logic
       if (redirectPath && redirectPath !== "/dashboard") {
         navigate(redirectPath, { replace: true });
         return;
@@ -65,50 +102,51 @@ const Login = () => {
         errorRef.current.focus();
       }
     } finally {
-      setLoading(false); // ✅ STOP LOADING
+      setLoading(false);
     }
+  };
+
+  // Handle input change + clear field error
+  const handleChange = (field, value) => {
+    if (field === "email") setEmail(value);
+    if (field === "password") setPassword(value);
+
+    setErrors({ ...errors, [field]: "" });
   };
 
   return (
     <main className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center px-4 py-8">
-      <section
-        className="max-w-md w-full bg-[var(--bg-primary)] rounded-2xl shadow-xl border border-[var(--border)]"
-        aria-labelledby="login-heading"
-      >
+      <section className="max-w-md w-full bg-[var(--bg-primary)] rounded-2xl shadow-xl border border-[var(--border)]">
         <div className="p-8">
 
+          {/* HEADING */}
           <h1
-            id="login-heading"
             ref={headingRef}
             tabIndex="-1"
-            className="text-3xl font-extrabold text-[var(--text-primary)] mb-4 focus:outline-none"
+            className="text-3xl font-extrabold mb-4"
           >
             Welcome Back
           </h1>
 
-          <p className="text-[var(--text-secondary)] mb-6">
+          <p className="mb-6">
             {shouldShowSurveyLoginMessage
               ? "Login to fill and submit this form."
               : "Login to manage your accessible surveys."}
           </p>
 
+          {/* INFO MESSAGE */}
           {infoMessage && (
-            <div
-              className="mb-4 p-3 rounded bg-[var(--bg-secondary)] text-[var(--text-primary)]"
-              role="status"
-              aria-live="polite"
-            >
+            <div className="mb-4 p-3 rounded bg-gray-100">
               {infoMessage}
             </div>
           )}
 
+          {/* API ERROR */}
           {errorMessage && (
             <div
               ref={errorRef}
               tabIndex="-1"
-              className="mb-4 p-3 rounded border border-red-500 text-red-600"
-              role="alert"
-              aria-live="assertive"
+              className="mb-4 p-3 border border-red-500 text-red-600 rounded"
             >
               {errorMessage}
             </div>
@@ -116,48 +154,47 @@ const Login = () => {
 
           <form onSubmit={handleLogin} className="space-y-6" noValidate>
 
+            {/* EMAIL */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-bold text-[var(--text-primary)] mb-1"
-              >
+              <label className="text-sm font-bold mb-1 block">
                 Email Address
               </label>
 
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-[var(--text-secondary)]" />
-
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
-                  id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="  Enter your email"
-                  required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
+                  onChange={(e) =>
+                    handleChange("email", e.target.value)
+                  }
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg"
                 />
               </div>
+
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email}
+                </p>
+              )}
             </div>
 
+            {/* PASSWORD */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-bold text-[var(--text-primary)] mb-1"
-              >
+              <label className="text-sm font-bold mb-1 block">
                 Password
               </label>
 
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 text-[var(--text-secondary)]" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2" />
 
                 <input
-                  id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
+                  onChange={(e) =>
+                    handleChange("password", e.target.value)
+                  }
+                  className="w-full pl-10 pr-10 py-2 border rounded-lg"
                 />
 
                 <button
@@ -165,32 +202,33 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.password}
+                </p>
+              )}
             </div>
 
-            {/* ✅ UPDATED BUTTON */}
+            {/* SUBMIT */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[var(--primary)] text-[var(--text-on-primary)]
-              py-3 rounded-lg font-bold flex items-center justify-center gap-2
-              focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)]
-              active:scale-95 transition disabled:opacity-60"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {loading ? "Signing In..." : "Sign In"}
-              <ArrowRight size={20} />
+              <ArrowRight size={18} />
             </button>
           </form>
 
-          <p className="mt-8 text-center text-[var(--text-secondary)] text-sm">
+          {/* REGISTER LINK */}
+          <p className="mt-6 text-center text-sm">
             Don't have an account?{" "}
-            <Link
-              to={`/register?redirect=${encodeURIComponent(redirectPath)}`}
-              className="text-[var(--primary)] font-bold hover:underline"
-            >
-              Create one for free
+            <Link to={`/register?redirect=${redirectPath}`}>
+              Create one
             </Link>
           </p>
         </div>
