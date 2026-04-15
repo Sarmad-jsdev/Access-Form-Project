@@ -200,6 +200,7 @@ const Register = () => {
                     handleChange("password", e.target.value)
                   }
                   className="w-full pl-10 pr-10 py-2 border rounded-lg"
+                  placeholder="Enter your password"
                 />
                 <button
                   type="button"
@@ -228,6 +229,7 @@ const Register = () => {
                   handleChange("confirmPassword", e.target.value)
                 }
                 className="w-full pl-10 pr-10 py-2 border rounded-lg"
+                placeholder="Confirm Password"
               />
                 <button
                   type="button"
