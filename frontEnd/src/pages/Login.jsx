@@ -17,22 +17,23 @@ const Login = () => {
 
   // UI state
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); // API error
-  const [errors, setErrors] = useState({}); // field errors
+  const [errorMessage, setErrorMessage] = useState("");
+  const [errors, setErrors] = useState({});
   const [infoMessage, setInfoMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // ✅ NEW: success modal state
+  const [successMessage, setSuccessMessage] = useState("");
 
   const headingRef = useRef(null);
   const errorRef = useRef(null);
 
-  // Show survey login message
   useEffect(() => {
     if (shouldShowSurveyLoginMessage) {
       setInfoMessage("Please login to fill and submit this form.");
     }
   }, [shouldShowSurveyLoginMessage]);
 
-  // Focus heading on load
   useEffect(() => {
     if (headingRef.current) {
       headingRef.current.focus();
@@ -43,14 +44,12 @@ const Login = () => {
   const validate = () => {
     const newErrors = {};
 
-    // Email validation
     if (!email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(email)) {
       newErrors.email = "Invalid email format";
     }
 
-    // Password validation
     if (!password) {
       newErrors.password = "Password is required";
     } else if (password.length < 6) {
@@ -67,7 +66,6 @@ const Login = () => {
 
     const validationErrors = validate();
 
-    // Stop if validation fails
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -78,21 +76,27 @@ const Login = () => {
 
       const loggedInUser = await login(email, password);
 
-      // Redirect logic
-      if (redirectPath && redirectPath !== "/dashboard") {
-        navigate(redirectPath, { replace: true });
-        return;
-      }
+      // ✅ SHOW SUCCESS MODAL
+      setSuccessMessage("Login successful! Redirecting...");
 
-      if (loggedInUser.role === "admin") {
-        navigate("/AdminDashboard", { replace: true });
-      } else if (loggedInUser.role === "creator") {
-        navigate("/creator-dashboard", { replace: true });
-      } else if (loggedInUser.role === "respondent") {
-        navigate("/Respondent", { replace: true });
-      } else {
-        navigate("/dashboard", { replace: true });
-      }
+      // ⏳ DELAY REDIRECT (same logic preserved)
+      setTimeout(() => {
+        if (redirectPath && redirectPath !== "/dashboard") {
+          navigate(redirectPath, { replace: true });
+          return;
+        }
+
+        if (loggedInUser.role === "admin") {
+          navigate("/AdminDashboard", { replace: true });
+        } else if (loggedInUser.role === "creator") {
+          navigate("/creator-dashboard", { replace: true });
+        } else if (loggedInUser.role === "respondent") {
+          navigate("/Respondent", { replace: true });
+        } else {
+          navigate("/dashboard", { replace: true });
+        }
+      }, 1200); // small professional delay
+
     } catch (err) {
       const message =
         err.response?.data?.message || "Login failed. Please try again.";
@@ -106,7 +110,6 @@ const Login = () => {
     }
   };
 
-  // Handle input change + clear field error
   const handleChange = (field, value) => {
     if (field === "email") setEmail(value);
     if (field === "password") setPassword(value);
@@ -116,10 +119,22 @@ const Login = () => {
 
   return (
     <main className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center px-4 py-8">
+
+      {/* ✅ SUCCESS MODAL */}
+      {successMessage && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center animate-fadeIn">
+            <div className="text-green-600 text-lg font-bold mb-2">
+              ✅ Success
+            </div>
+            <p className="text-gray-700">{successMessage}</p>
+          </div>
+        </div>
+      )}
+
       <section className="max-w-md w-full bg-[var(--bg-primary)] rounded-2xl shadow-xl border border-[var(--border)]">
         <div className="p-8">
 
-          {/* HEADING */}
           <h1
             ref={headingRef}
             className="text-3xl font-extrabold mb-4"
@@ -133,14 +148,12 @@ const Login = () => {
               : "Login to manage your accessible surveys."}
           </p>
 
-          {/* INFO MESSAGE */}
           {infoMessage && (
             <div className="mb-4 p-3 rounded bg-gray-100">
               {infoMessage}
             </div>
           )}
 
-          {/* API ERROR */}
           {errorMessage && (
             <div
               ref={errorRef}
@@ -225,7 +238,6 @@ const Login = () => {
             </button>
           </form>
 
-          {/* REGISTER LINK */}
           <p className="mt-6 text-center text-sm">
             Don't have an account?{" "}
             <Link to={`/register?redirect=${redirectPath}`}>
