@@ -178,6 +178,7 @@ const Register = () => {
             </div>
 
             {/* ROLE */}
+            <label className="text-xs font-bold">Role</label>
             <select
               value={formData.role}
               onChange={(e) => handleChange("role", e.target.value)}
@@ -218,6 +219,8 @@ const Register = () => {
             {/* CONFIRM PASSWORD */}
             <div>
               <label className="text-xs font-bold">Confirm Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
               <input
                 type={showPassword ? "text" : "password"}
                 value={formData.confirmPassword}
@@ -226,6 +229,14 @@ const Register = () => {
                 }
                 className="w-full p-2 border rounded-lg"
               />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
               {errors.confirmPassword && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.confirmPassword}
