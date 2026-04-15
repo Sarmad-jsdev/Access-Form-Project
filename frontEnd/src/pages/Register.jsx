@@ -227,7 +227,7 @@ const Register = () => {
                 onChange={(e) =>
                   handleChange("confirmPassword", e.target.value)
                 }
-                className="w-full p-2 border rounded-lg"
+                className="w-full pl-10 pr-10 py-2 border rounded-lg"
               />
                 <button
                   type="button"
