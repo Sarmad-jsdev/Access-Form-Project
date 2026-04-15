@@ -122,7 +122,6 @@ const Login = () => {
           {/* HEADING */}
           <h1
             ref={headingRef}
-            tabIndex="-1"
             className="text-3xl font-extrabold mb-4"
           >
             Welcome Back
@@ -168,7 +167,8 @@ const Login = () => {
                   onChange={(e) =>
                     handleChange("email", e.target.value)
                   }
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg"
+                  className="w-full pl-16 pr-8 py-2 border rounded-lg"
+                  placeholder=" Enter your email address"
                 />
               </div>
 
@@ -194,7 +194,8 @@ const Login = () => {
                   onChange={(e) =>
                     handleChange("password", e.target.value)
                   }
-                  className="w-full pl-10 pr-10 py-2 border rounded-lg"
+                  className="w-full pl-16 pr-10 py-2 border rounded-lg"
+                  placeholder=" Enter your password"
                 />
 
                 <button
