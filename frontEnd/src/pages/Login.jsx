@@ -167,7 +167,7 @@ const Login = () => {
                   onChange={(e) =>
                     handleChange("email", e.target.value)
                   }
-                  className="w-full pl-10 pr-8 py-2 border rounded-lg"
+                  className="w-full pl-12 pr-8 py-2 border rounded-lg"
                   placeholder=" Enter your email address"
                 />
               </div>
@@ -194,7 +194,7 @@ const Login = () => {
                   onChange={(e) =>
                     handleChange("password", e.target.value)
                   }
-                  className="w-full pl-10 pr-8 py-2 border rounded-lg"
+                  className="w-full pl-12 pr-8 py-2 border rounded-lg"
                   placeholder=" Enter your password"
                 />
 
