@@ -4,9 +4,9 @@ import {
   User,
   Mail,
   Lock,
-  ShieldCheck,
   ArrowRight,
-  Eye, EyeOff
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import axiosInstance from "../axiosConfig";
 
@@ -14,12 +14,14 @@ const Register = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirectPath = searchParams.get("redirect") || "/dashboard";
-  const [showPassword, setShowPassword] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Reference for focusing error message
   const errorRef = useRef(null);
 
+  // Form data (single source of truth)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -28,26 +30,71 @@ const Register = () => {
     confirmPassword: "",
   });
 
+  // Global error (API / submit)
   const [error, setError] = useState("");
+
+  // Field-level errors
+  const [errors, setErrors] = useState({});
+
   const [loading, setLoading] = useState(false);
 
+  // Focus on error when it appears
   useEffect(() => {
     if (error && errorRef.current) {
       errorRef.current.focus();
     }
   }, [error]);
 
+  // ---------------- VALIDATION ----------------
+  const validate = () => {
+    const newErrors = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (formData.name.length < 3) {
+      newErrors.name = "At least 3 characters required";
+    }
+
+    // Email validation
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Minimum 6 characters required";
+    }
+
+    // Confirm password
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    return newErrors;
+  };
+
+  // ---------------- HANDLE SUBMIT ----------------
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (formData.password !== formData.confirmPassword) {
-      return setError("Passwords do not match.");
+    const validationErrors = validate();
+
+    // Stop if validation fails
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
     }
 
     try {
       setLoading(true);
-      const res = await axiosInstance.post("/api/auth/register", formData);
+
+      await axiosInstance.post("/api/auth/register", formData);
 
       navigate(`/login?redirect=${redirectPath}`, { replace: true });
     } catch (err) {
@@ -59,234 +106,148 @@ const Register = () => {
     }
   };
 
+  // Handle input change + clear field error
+  const handleChange = (field, value) => {
+    setFormData({ ...formData, [field]: value });
+
+    // Clear error for that field
+    setErrors({ ...errors, [field]: "" });
+  };
+
   return (
     <main className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center px-4 py-12">
-      <section
-        className="max-w-xl w-full bg-[var(--bg-primary)] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col md:flex-row"
-        aria-labelledby="register-heading"
-      >
-        {/* Left Section */}
+      <section className="max-w-xl w-full bg-[var(--bg-primary)] rounded-2xl shadow-2xl border border-[var(--border)] overflow-hidden flex flex-col md:flex-row">
+        
+        {/* LEFT SIDE */}
         <div className="md:w-2/5 bg-[var(--primary)] p-8 text-[var(--text-on-primary)] flex flex-col justify-center">
-          <h1 id="register-heading" className="text-2xl font-bold mb-4">
-            Join the Movement
-          </h1>
-          <p className="text-sm opacity-90 leading-relaxed">
+          <h1 className="text-2xl font-bold mb-4">Join the Movement</h1>
+          <p className="text-sm opacity-90">
             Create an account to build surveys everyone can answer.
           </p>
         </div>
 
-        {/* Form Section */}
-        <div className="md:w-3/5 p-8 flex flex-col justify-center">
-          <form onSubmit={handleRegister} noValidate className="space-y-4">
+        {/* RIGHT SIDE FORM */}
+        <div className="md:w-3/5 p-8">
+          <form onSubmit={handleRegister} className="space-y-4" noValidate>
 
-            {/* Accessible Error Message */}
+            {/* GLOBAL ERROR */}
             {error && (
               <div
                 ref={errorRef}
                 tabIndex="-1"
-                role="alert"
-                aria-live="assertive"
-                className="p-3 rounded-lg bg-red-100 text-red-700 border border-red-300 focus:outline-none"
+                className="p-3 bg-red-100 text-red-700 border border-red-300 rounded"
               >
                 {error}
               </div>
             )}
 
-            {/* Full Name */}
-            <div className="flex flex-col gap-1">
-              <label
-                htmlFor="name"
-                className="text-xs font-bold uppercase text-[var(--text-primary)]"
-              >
-                Full Name
-              </label>
+            {/* NAME */}
+            <div>
+              <label className="text-xs font-bold">Full Name</label>
               <div className="relative">
-                <User
-                  aria-hidden="true"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)]"
-                />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
                 <input
-                  id="name"
                   type="text"
-                  autoComplete="name"
-                  placeholder="Enter your name"
-                  required
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg"
+                  placeholder="Enter your name"
                 />
               </div>
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+              )}
             </div>
 
-            {/* Email */}
-            <div className="flex flex-col gap-1">
-              <label
-                htmlFor="email"
-                className="text-xs font-bold uppercase text-[var(--text-primary)]"
-              >
-                Email
-              </label>
+            {/* EMAIL */}
+            <div>
+              <label className="text-xs font-bold">Email</label>
               <div className="relative">
-                <Mail
-                  aria-hidden="true"
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)]"
-                />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
                 <input
-                  id="email"
                   type="email"
-                  autoComplete="email"
-                  placeholder="Enter your email"
-                  required
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg"
+                  placeholder="Enter your email"
                 />
               </div>
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
             </div>
 
-            {/* Role */}
-            <div className="flex flex-col gap-1">
-              <label
-                htmlFor="role"
-                className="text-xs font-bold uppercase text-[var(--text-primary)]"
-              >
-                Select Role
-              </label>
-              <div className="relative">
-                
-                <select
-                  id="role"
-                  value={formData.role}
-                  onChange={(e) =>
-                    setFormData({ ...formData, role: e.target.value })
-                  }
-                  className="w-full pr-10 pl-2 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
-                >
-                  <option value="respondent">Respondent</option>
-                  <option value="creator">Form Creator</option>
-                </select>
-              </div>
-            </div>
+            {/* ROLE */}
+            <select
+              value={formData.role}
+              onChange={(e) => handleChange("role", e.target.value)}
+              className="w-full p-2 border rounded-lg"
+            >
+              <option value="respondent">Respondent</option>
+              <option value="creator">Form Creator</option>
+            </select>
 
-            {/* Password */}
+            {/* PASSWORD */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-bold text-[var(--text-primary)] mb-1"
-              >
-                Password
-              </label>
-
+              <label className="text-xs font-bold">Password</label>
               <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)]"
-                  aria-hidden="true"
-                />
-
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
                 <input
-                  id="password"
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                  aria-required="true"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
+                  value={formData.password}
+                  onChange={(e) =>
+                    handleChange("password", e.target.value)
+                  }
+                  className="w-full pl-10 pr-10 py-2 border rounded-lg"
                 />
-
-                {/* Accessible Toggle */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={
-                    showPassword
-                      ? "Hide password"
-                      : "Show password"
-                  }
-                  aria-pressed={showPassword}
-                  className="absolute right-3 top-1/2 -translate-y-1/2
-                  focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]
-                  rounded"
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
-                  {showPassword ? (
-                    <EyeOff size={20} className="text-[var(--text-secondary)] w-4 h-4" aria-hidden="true" />
-                  ) : (
-                    <Eye size={20} className="text-[var(--text-secondary)] w-4 h-4" aria-hidden="true" />
-                  )}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.password}
+                </p>
+              )}
             </div>
 
-            {/* Confirm Password */}
+            {/* CONFIRM PASSWORD */}
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-bold text-[var(--text-primary)] mb-1"
-              >
-                Confirm Password
-              </label>
-
-              <div className="relative">
-                <Lock
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)]"
-                  aria-hidden="true"
-                />
-
-                <input
-                  id="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                  aria-required="true"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
-                />
-
-                {/* Accessible Toggle */}
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={
-                    showPassword
-                      ? "Hide password"
-                      : "Show password"
-                  }
-                  aria-pressed={showPassword}
-                  className="absolute right-3 top-1/2 -translate-y-1/2
-                  focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]
-                  rounded"
-                >
-                  {showPassword ? (
-                    <EyeOff size={20} className="text-[var(--text-secondary)] w-4 h-4" aria-hidden="true" />
-                  ) : (
-                    <Eye size={20} className="text-[var(--text-secondary)] w-4 h-4" aria-hidden="true" />
-                  )}
-                </button>
-              </div>
+              <label className="text-xs font-bold">Confirm Password</label>
+              <input
+                type={showPassword ? "text" : "password"}
+                value={formData.confirmPassword}
+                onChange={(e) =>
+                  handleChange("confirmPassword", e.target.value)
+                }
+                className="w-full p-2 border rounded-lg"
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.confirmPassword}
+                </p>
+              )}
             </div>
 
-            {/* Submit */}
+            {/* SUBMIT */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[var(--primary)] text-[var(--text-on-primary)] py-3 rounded-lg font-bold mt-4 hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full bg-blue-600 text-white py-2 rounded-lg flex justify-center items-center gap-2"
             >
-              {loading ? "Creating Account..." : "Sign Up"}
-              <ArrowRight aria-hidden="true" size={18} />
+              {loading ? "Creating..." : "Sign Up"}
+              <ArrowRight size={16} />
             </button>
           </form>
 
-          <p className="text-center mt-6 text-sm text-[var(--text-secondary)]">
+          {/* LOGIN LINK */}
+          <p className="text-center mt-4 text-sm">
             Already have an account?{" "}
-            <Link
-              to={`/login?redirect=${redirectPath}`}
-              className="font-bold text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--focus-ring)] rounded"
-            >
+            <Link to={`/login?redirect=${redirectPath}`}>
               Login
             </Link>
           </p>
