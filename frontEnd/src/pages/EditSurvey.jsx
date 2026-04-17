@@ -5,8 +5,6 @@ import { useParams, useNavigate } from "react-router-dom";
 const EditSurvey = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const API_BASE_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const [survey, setSurvey] = useState(null);
   const headingRef = useRef(null);
@@ -16,7 +14,7 @@ const EditSurvey = () => {
     const fetchSurvey = async () => {
       try {
         const res = await axiosInstance.get(
-          `${API_BASE_URL}/api/creator/survey/${id}`,
+          `/creator/survey/${id}`,
           {}
         );
         setSurvey(res.data);
@@ -38,7 +36,7 @@ const EditSurvey = () => {
   const handleUpdate = async () => {
     try {
       await axiosInstance.put(
-        `${API_BASE_URL}/api/creator/edit-survey/${id}`,
+        `/creator/edit-survey/${id}`,
         survey,
         {}
       );

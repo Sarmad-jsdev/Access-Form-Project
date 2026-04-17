@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 const CreateForm = () => {
   const navigate = useNavigate();
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -47,18 +46,21 @@ const CreateForm = () => {
 
   // Submit form
   const handleSubmit = async () => {
-    try {
-      await axiosInstance.post(`${API_BASE_URL}/api/creator/create-survey`, {
-        title,
-        description,
-        questions,
-      });
-      alert("Form created successfully!");
-      navigate("/creator-dashboard");
-    } catch (err) {
-      alert("Error creating form");
-    }
-  };
+  try {
+    await axiosInstance.post("/creator/create-survey", {
+      title,
+      description,
+      questions,
+    });
+
+    alert("Form created successfully!");
+    navigate("/creator-dashboard");
+
+  } catch (err) {
+    console.error(err);
+    alert("Error creating form");
+  }
+};
 
   return (
     <div className="min-h-screen p-8 bg-[var(--bg-secondary)]">

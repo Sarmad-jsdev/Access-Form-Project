@@ -173,14 +173,14 @@ const Login = () => {
               </label>
 
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) =>
                     handleChange("email", e.target.value)
                   }
-                  className="w-full pl-12 pr-8 py-2 border rounded-lg"
+                  className="w-full pl-8 pr-8 py-2 border rounded-lg"
                   placeholder=" Enter your email address"
                 />
               </div>
@@ -199,7 +199,7 @@ const Login = () => {
               </label>
 
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 " />
 
                 <input
                   type={showPassword ? "text" : "password"}
@@ -207,7 +207,7 @@ const Login = () => {
                   onChange={(e) =>
                     handleChange("password", e.target.value)
                   }
-                  className="w-full pl-12 pr-8 py-2 border rounded-lg"
+                  className="w-full pl-8 pr-8 py-2 border rounded-lg"
                   placeholder=" Enter your password"
                 />
 
@@ -231,7 +231,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-3 rounded-lg flex items-center justify-center gap-2 disabled:opacity-60  font-bold transition-all shadow-lg active:scale-95 focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)]"
             >
               {loading ? "Signing In..." : "Sign In"}
               <ArrowRight size={18} />

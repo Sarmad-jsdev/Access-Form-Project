@@ -6,9 +6,6 @@ const SurveyAnalytics = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const API_BASE_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000";
-
   const [analytics, setAnalytics] = useState(null);
   const [error, setError] = useState("");
   const messageRef = useRef(null);
@@ -25,7 +22,7 @@ const SurveyAnalytics = () => {
     const fetchAnalytics = async () => {
       try {
         const res = await axiosInstance.get(
-          `${API_BASE_URL}/api/creator/survey-analytics/${id}`,
+          `/creator/survey-analytics/${id}`,
           {}
         );
         setAnalytics(res.data);

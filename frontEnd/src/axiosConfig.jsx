@@ -1,13 +1,13 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000";
+// IMPORTANT: VITE_API_URL must already include /api
+// Example: https://your-backend.vercel.app/api
 
 const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
-// 🔥 Automatically attach token
+// Automatically attach token
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 

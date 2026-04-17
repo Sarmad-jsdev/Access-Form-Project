@@ -250,7 +250,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg flex justify-center items-center gap-2"
+              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-3 rounded-lg flex items-center justify-center gap-2 disabled:opacity-60  font-bold transition-all shadow-lg active:scale-95 focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)]"
             >
               {loading ? "Creating..." : "Sign Up"}
               <ArrowRight size={16} />

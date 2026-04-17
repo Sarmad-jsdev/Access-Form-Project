@@ -56,10 +56,6 @@ router.get("/survey/:id/fill", authMiddleware, async (req, res) => {
       return res.status(404).json({ message: "Survey not found or inactive" });
     }
 
-    // Prevent creator from filling own survey
-    if (survey.creator.toString() === req.user.id) {
-      return res.status(403).json({ message: "Creators cannot fill their own survey" });
-    }
 
     // Prevent multiple submissions
     const existingResponse = await Response.findOne({

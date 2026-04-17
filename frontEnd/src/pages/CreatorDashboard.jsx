@@ -11,7 +11,6 @@ const CreatorDashboard = () => {
     totalResponses: 0,
   });
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   // Copy link to clipboard
   const handleCopyLink = (surveyId) => {
@@ -20,13 +19,13 @@ const CreatorDashboard = () => {
     alert("Survey link copied to clipboard!");
   };
 
-  const fetchSurveys = async () => {
+ const fetchSurveys = async () => {
     try {
-      const res = await axiosInstance.get(`${API_BASE_URL}/api/creator/my-surveys`, {});
+      const res = await axiosInstance.get("/creator/my-surveys");
       setSurveys(res.data.surveys);
       setStats(res.data.stats);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch surveys error:", err);
     }
   };
 
@@ -37,7 +36,7 @@ const CreatorDashboard = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this survey?")) return;
     try {
-      await axiosInstance.delete(`${API_BASE_URL}/api/creator/delete-survey/${id}`, {});
+      await axiosInstance.delete(`/creator/delete-survey/${id}`);
       fetchSurveys();
     } catch (err) {
       console.error(err);

@@ -6,8 +6,6 @@ const PreviewSurvey = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [survey, setSurvey] = useState(null);
-  const API_BASE_URL =
-    import.meta.env.VITE_API_URL || "http://localhost:5000";
 
   const headingRef = useRef(null);
 
@@ -15,7 +13,7 @@ const PreviewSurvey = () => {
     const fetchSurvey = async () => {
       try {
         const res = await axiosInstance.get(
-          `${API_BASE_URL}/api/creator/survey/${id}`,
+          `/creator/survey/${id}`,
           {}
         );
         setSurvey(res.data);

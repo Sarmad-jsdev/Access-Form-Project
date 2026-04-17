@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import axiosInstance from "../axiosConfig"; // Use the configured axios instance
+import axiosInstance from "../axiosConfig";
 
 export const AuthContext = createContext();
 
@@ -8,45 +8,44 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-      // ✅ STOP if no token
-      if (!token) {
+        if (!token) {
+          setUser(null);
+          setLoading(false); // FIXED
+          return;
+        }
+
+        const res = await axiosInstance.get("/auth/me");
+        setUser(res.data);
+      } catch (err) {
         setUser(null);
-        return;
+      } finally {
+        setLoading(false); // ALWAYS STOP LOADING
       }
+    };
 
-      const res = await axiosInstance.get("/api/auth/me");
-      setUser(res.data);
-    } catch (err) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchUser();
-}, []);
+    fetchUser();
+  }, []);
 
   const login = async (email, password) => {
-  const res = await axiosInstance.post("/api/auth/login", {
-    email,
-    password,
-  });
+    const res = await axiosInstance.post("/auth/login", {
+      email,
+      password,
+    });
 
-  // ✅ Store token
-  localStorage.setItem("token", res.data.token);
+    localStorage.setItem("token", res.data.token);
+    setUser(res.data.user);
 
-  setUser(res.data.user);
-  return res.data.user;
-};
+    return res.data.user;
+  };
 
-  const logout = async () => {
-  localStorage.removeItem("token");  // 🔥 Remove token
-  setUser(null);
-};
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>

@@ -20,7 +20,7 @@ const AdminDashboard = () => {
 
   const fetchDashboard = async () => {
     try {
-      const res = await axiosInstance.get("/api/admin/dashboard");
+      const res = await axiosInstance.get("/admin/dashboard");
       setStats(res.data.stats);
       setUsers(res.data.users);
     } catch (err) { console.error(err); alert("Failed to fetch dashboard data"); }
@@ -28,7 +28,7 @@ const AdminDashboard = () => {
 
   const toggleUserStatus = async (userId) => {
     try {
-      await axiosInstance.put(`/api/admin/block/${userId}`);
+      await axiosInstance.put(`/admin/block/${userId}`);
       setUsers(prev => prev.map(u => u._id === userId ? {...u, isBlocked: !u.isBlocked} : u));
       setStats(prev => ({...prev, activeUsers: prev.activeUsers + (users.find(u => u._id===userId)?.isBlocked ? 1 : -1)}));
     } catch (err) { console.error(err); alert("Failed to update user status"); }
