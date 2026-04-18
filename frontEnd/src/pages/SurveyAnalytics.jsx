@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import axiosInstance from "../axiosConfig";
 import { useParams, useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const SurveyAnalytics = () => {
   const { id } = useParams();
@@ -8,58 +10,112 @@ const SurveyAnalytics = () => {
 
   const [analytics, setAnalytics] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const messageRef = useRef(null);
 
-  // Focus message when error appears
-  useEffect(() => {
-    if (error && messageRef.current) {
-      messageRef.current.focus();
-    }
-  }, [error]);
-
-  // Fetch analytics
+  // =========================
+  // FETCH ANALYTICS
+  // =========================
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
+        setLoading(true);
+
         const res = await axiosInstance.get(
-          `/creator/survey-analytics/${id}`,
-          {}
+          `/creator/analytics/${id}`
         );
+
         setAnalytics(res.data);
-      } catch (fetchError) {
-        setError(
-          fetchError.response?.data?.message ||
-            "Failed to load analytics"
-        );
+      } catch (err) {
+        setError(err.response?.data?.message || "Failed to load analytics");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchAnalytics();
-  }, [id, API_BASE_URL]);
+  }, [id]);
 
-  // Loading State
-  if (!analytics && !error) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        className="p-8"
-      >
-        Loading analytics...
-      </div>
-    );
+  // =========================
+  // EXPORT CSV
+  // =========================
+  const exportCSV = () => {
+    if (!analytics?.responses) return;
+
+    let csv = "Response,Name,Email,Question,Answer\n";
+
+    analytics.responses.forEach((resp, index) => {
+      resp.answers.forEach((ans) => {
+        csv += `${index + 1},${resp.respondentName},${resp.respondentEmail},${ans.questionText},${
+          Array.isArray(ans.answer)
+            ? ans.answer.join("|")
+            : ans.answer
+        }\n`;
+      });
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${analytics.surveyTitle}-report.csv`;
+    a.click();
+  };
+
+  // =========================
+  // EXPORT PDF
+  // =========================
+  const exportPDF = () => {
+    if (!analytics?.responses) return;
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text(analytics.surveyTitle, 14, 15);
+
+    doc.setFontSize(11);
+    doc.text(`Total Responses: ${analytics.totalResponses}`, 14, 25);
+
+    const tableData = [];
+
+    analytics.responses.forEach((resp, index) => {
+      resp.answers.forEach((ans) => {
+        tableData.push([
+          index + 1,
+          resp.respondentName,
+          resp.respondentEmail,
+          ans.questionText,
+          Array.isArray(ans.answer)
+            ? ans.answer.join(", ")
+            : ans.answer,
+        ]);
+      });
+    });
+
+    autoTable(doc, {
+      startY: 35,
+      head: [["#", "Name", "Email", "Question", "Answer"]],
+      body: tableData,
+    });
+
+    doc.save(`${analytics.surveyTitle}-report.pdf`);
+  };
+
+  // =========================
+  // LOADING
+  // =========================
+  if (loading) {
+    return <div className="p-8 text-[var(--text-secondary)]">Loading...</div>;
   }
 
-  // Error State
+  // =========================
+  // ERROR
+  // =========================
   if (error) {
     return (
-      <div
-        ref={messageRef}
-        tabIndex="-1"
-        role="alert"
-        aria-live="assertive"
-        className="p-8 text-red-700 bg-red-100 border border-red-300 rounded focus:outline-none"
-      >
+      <div ref={messageRef} className="p-6 text-red-600">
         {error}
       </div>
     );
@@ -67,89 +123,81 @@ const SurveyAnalytics = () => {
 
   return (
     <main className="min-h-screen p-8 bg-[var(--bg-secondary)]">
-      {/* Back Button */}
+
+      {/* BACK */}
       <button
         onClick={() => navigate("/creator-dashboard")}
-        className="mb-6 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition focus:ring-2 focus:ring-gray-400"
+        className="mb-4 px-4 py-2 rounded bg-[var(--bg-primary)] text-[var(--text-primary)] border border-[var(--border)]"
       >
-        ← Back to Dashboard
+        ← Back
       </button>
 
-      <section
-        aria-labelledby="analytics-heading"
-        className="bg-[var(--bg-primary)] text-[var(--text-primary)] p-8 rounded-xl shadow max-w-5xl mx-auto"
-      >
-        <header className="mb-6">
-          <h1
-            id="analytics-heading"
-            className="text-3xl font-bold"
+      {/* HEADER */}
+      <div className="bg-[var(--bg-primary)] p-6 rounded-xl border border-[var(--border)] mb-6">
+
+        <h1 className="text-3xl font-bold text-[var(--text-primary)]">
+          {analytics.surveyTitle}
+        </h1>
+
+        <p className="text-[var(--text-secondary)] mt-2">
+          Total Responses:{" "}
+          <span className="text-[var(--primary)] font-bold">
+            {analytics.totalResponses}
+          </span>
+        </p>
+
+        {/* EXPORT BUTTONS */}
+        <div className="flex gap-3 mt-4">
+
+          <button
+            onClick={exportCSV}
+            className="px-4 py-2 rounded bg-[var(--primary)] text-[var(--text-on-primary)] cursor-pointer transition"
           >
-            {analytics.surveyTitle}
-          </h1>
+            Export CSV
+          </button>
 
-          <p className="mt-2 font-semibold text-lg">
-            Total Responses:{" "}
-            <span className="text-blue-600">
-              {analytics.totalResponses}
-            </span>
-          </p>
-        </header>
-
-        {/* Responses Section */}
-        <section aria-labelledby="responses-heading">
-          <h2
-            id="responses-heading"
-            className="text-xl font-bold mb-4"
+          <button
+            onClick={exportPDF}
+            className="px-4 py-2 rounded bg-[var(--accent)] text-[var(--text-on-primary)] cursor-pointer transition"
           >
-            Individual Responses
-          </h2>
+            Export PDF
+          </button>
 
-          {analytics.responses.length > 0 ? (
-            analytics.responses.map((resp, idx) => (
-              <article
-                key={resp._id || idx}
-                className="mb-6 p-5 border rounded-lg shadow-sm bg-[var(--bg-secondary)] p-3 rounded text-[var(--text-primary)]"
-              >
-                <header className="mb-3 ">
-                  <h3 className="font-semibold text-lg">
-                    Response {idx + 1}
-                  </h3>
+        </div>
+      </div>
 
-                  <p className="text-sm text-gray-600">
-                    <strong>Name:</strong>{" "}
-                    {resp.respondentName}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    <strong>Email:</strong>{" "}
-                    {resp.respondentEmail}
-                  </p>
-                </header>
+      {/* RESPONSES */}
+      <div className="space-y-6">
 
-                <section>
-                  {(resp.answers || []).map((ans, i) => (
-                    <div key={i} className="mb-3">
-                      <p>
-                        <strong>Question:</strong>{" "}
-                        {ans.questionText || ans.question}
-                      </p>
-                      <p>
-                        <strong>Answer:</strong>{" "}
-                        {Array.isArray(ans.answer)
-                          ? ans.answer.join(", ")
-                          : String(ans.answer ?? "")}
-                      </p>
-                    </div>
-                  ))}
-                </section>
-              </article>
-            ))
-          ) : (
-            <p className="text-gray-600">
-              No responses yet.
+        {analytics.responses.map((resp, i) => (
+          <div
+            key={i}
+            className="p-5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border)]"
+          >
+            <h2 className="font-bold text-[var(--text-primary)]">
+              Response #{i + 1}
+            </h2>
+
+            <p className="text-[var(--text-secondary)]">
+              {resp.respondentName} ({resp.respondentEmail})
             </p>
-          )}
-        </section>
-      </section>
+
+            <div className="mt-3 space-y-2">
+              {resp.answers.map((ans, j) => (
+                <div key={j} className="p-3 bg-[var(--bg-secondary)] rounded">
+                  <p className="font-semibold">{ans.questionText}</p>
+                  <p className="text-[var(--text-secondary)]">
+                    {Array.isArray(ans.answer)
+                      ? ans.answer.join(", ")
+                      : ans.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+      </div>
     </main>
   );
 };

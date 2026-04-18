@@ -31,7 +31,7 @@ html {
    BASE COLORS
    ============================== */
 :root {
-  --bg-primary: #F1F5F9;      /* Cool Frost */
+  --bg-primary: #dee7f0;      /* Cool Frost */
   --bg-secondary: #FFFFFF;
   --text-primary: #1E293B;
   --text-secondary: #475569;
@@ -43,10 +43,20 @@ html {
   --focus-ring: #38BDF8;
   --text-on-primary: #FFFFFF;
 
-  /* Button colors */
-  --btn-delete: #DC2626;  /* Red delete button stays the same on all themes */
-  --btn-primary: var(--primary);
-  --btn-secondary: var(--accent);
+  --btn-preview: #2563EB;
+--btn-edit: #F59E0B;
+--btn-analytics: #7C3AED;
+--btn-success: #16A34A;
+--btn-warning: #F97316;
+
+--status-active-bg: #DCFCE7;
+--status-active-text: #166534;
+
+--status-inactive-bg: #FEE2E2;
+--status-inactive-text: #991B1B;
+
+
+--btn-hover: 0.9;
 
   /* Dyslexia-friendly font */
   --font-dyslexia: 'Lexend', Arial, sans-serif;
@@ -67,6 +77,13 @@ html {
   --border-color: #e1e6ec;
   --focus-ring: #A78BFA;
   --text-on-primary: #FFFFFF; 
+
+
+  --status-active-bg: #052e16;
+--status-active-text: #86efac;
+
+--status-inactive-bg: #450a0a;
+--status-inactive-text: #fca5a5;
 }
 
 /* ==============================
@@ -85,6 +102,12 @@ html {
   --focus-ring: #00FFFF;        /* Focus outlines */
 
   --text-on-primary: #000000;   /* Text on primary buttons */
+
+  --status-active-bg: #FFFF00;
+--status-active-text: #000000;
+
+--status-inactive-bg: #FF0000;
+--status-inactive-text: #FFFFFF;
 }
 
 

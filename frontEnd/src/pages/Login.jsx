@@ -1,252 +1,178 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import FieldError from "../Components/InlineError";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const redirectPath = searchParams.get("redirect") || "/dashboard";
-  const shouldShowSurveyLoginMessage = redirectPath.startsWith("/survey/");
+  const redirectPath = searchParams.get("redirect");
 
-  // Form state
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const isSurveyLogin = Boolean(redirectPath);
 
-  // UI state
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [errors, setErrors] = useState({});
-  const [infoMessage, setInfoMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [showOverlay, setShowOverlay] = useState(false);
 
-  // ✅ NEW: success modal state
-  const [successMessage, setSuccessMessage] = useState("");
-
-  const headingRef = useRef(null);
-  const errorRef = useRef(null);
-
-  useEffect(() => {
-    if (shouldShowSurveyLoginMessage) {
-      setInfoMessage("Please login to fill and submit this form.");
-    }
-  }, [shouldShowSurveyLoginMessage]);
-
-  useEffect(() => {
-    if (headingRef.current) {
-      headingRef.current.focus();
-    }
-  }, []);
-
-  // ---------------- VALIDATION ----------------
   const validate = () => {
-    const newErrors = {};
+    const err = {};
 
-    if (!email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Invalid email format";
-    }
+    if (!form.email) err.email = "Email required";
+    else if (!/\S+@\S+\.\S+/.test(form.email)) err.email = "Invalid email";
 
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Minimum 6 characters required";
-    }
+    if (!form.password) err.password = "Password required";
+    else if (form.password.length < 6)
+      err.password = "Min 6 characters required";
 
-    return newErrors;
+    return err;
   };
 
-  // ---------------- HANDLE LOGIN ----------------
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
 
-    const validationErrors = validate();
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+    const v = validate();
+    if (Object.keys(v).length) {
+      setErrors(v);
       return;
     }
 
     try {
       setLoading(true);
 
-      const loggedInUser = await login(email, password);
+      const user = await login(form.email, form.password);
 
-      // ✅ SHOW SUCCESS MODAL
-      setSuccessMessage("Login successful! Redirecting...");
+      setShowOverlay(true);
+      toast.success("Login successful 🎉");
 
-      // ⏳ DELAY REDIRECT (same logic preserved)
       setTimeout(() => {
-        if (redirectPath && redirectPath !== "/dashboard") {
-          navigate(redirectPath, { replace: true });
+        let path = redirectPath;
+
+        if (path) {
+          try {
+            path = decodeURIComponent(path);
+          } catch (e) {
+            path = null;
+          }
+        }
+
+        if (path && path.startsWith("/")) {
+          navigate(path, { replace: true });
           return;
         }
 
-        if (loggedInUser.role === "admin") {
-          navigate("/AdminDashboard", { replace: true });
-        } else if (loggedInUser.role === "creator") {
-          navigate("/creator-dashboard", { replace: true });
-        } else if (loggedInUser.role === "respondent") {
-          navigate("/Respondent", { replace: true });
-        } else {
-          navigate("/dashboard", { replace: true });
-        }
-      }, 1200); // small professional delay
-
+        if (user.role === "admin") navigate("/AdminDashboard");
+        else if (user.role === "creator") navigate("/creator-dashboard");
+        else navigate("/Respondent");
+      }, 1200);
     } catch (err) {
-      const message =
-        err.response?.data?.message || "Login failed. Please try again.";
-      setErrorMessage(message);
-
-      if (errorRef.current) {
-        errorRef.current.focus();
-      }
+      toast.error(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (field, value) => {
-    if (field === "email") setEmail(value);
-    if (field === "password") setPassword(value);
-
-    setErrors({ ...errors, [field]: "" });
+  const handleChange = (key, value) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    setErrors((prev) => ({ ...prev, [key]: "" }));
   };
 
   return (
-    <main className="min-h-screen bg-[var(--bg-secondary)] flex items-center justify-center px-4 py-8">
-
-      {/* ✅ SUCCESS MODAL */}
-      {successMessage && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm text-center animate-fadeIn">
-            <div className="text-green-600 text-lg font-bold mb-2">
-              ✅ Success
-            </div>
-            <p className="text-gray-700">{successMessage}</p>
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-secondary)] text-[var(--text-primary)] px-4">
+      {showOverlay && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-md z-50">
+          <div className="bg-[var(--bg-secondary)] p-6 rounded-xl text-center shadow-xl border border-[var(--border)]">
+            <h2 className="text-[var(--primary)] font-bold text-lg">
+              Login Successful
+            </h2>
+            <p className="text-[var(--text-secondary)]">Redirecting...</p>
           </div>
         </div>
       )}
 
-      <section className="max-w-md w-full bg-[var(--bg-primary)] rounded-2xl shadow-xl border border-[var(--border)]">
-        <div className="p-8">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md bg-[var(--bg-primary)] p-8 rounded-2xl shadow-lg border border-[var(--border)] space-y-5"
+      >
+        {/* ✅ CONDITIONAL HEADING ONLY */}
+        <h1 className="text-2xl font-bold text-center">
+          {isSurveyLogin ? "Login first to fill the survey" : "Welcome Back"}
+        </h1>
 
-          <h1
-            ref={headingRef}
-            className="text-3xl font-extrabold mb-4"
-          >
-            Welcome Back
-          </h1>
-
-          <p className="mb-6">
-            {shouldShowSurveyLoginMessage
-              ? "Login to fill and submit this form."
-              : "Login to manage your accessible surveys."}
-          </p>
-
-          {infoMessage && (
-            <div className="mb-4 p-3 rounded bg-gray-100">
-              {infoMessage}
-            </div>
-          )}
-
-          {errorMessage && (
-            <div
-              ref={errorRef}
-              tabIndex="-1"
-              className="mb-4 p-3 border border-red-500 text-red-600 rounded"
-            >
-              {errorMessage}
-            </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-6" noValidate>
-
-            {/* EMAIL */}
-            <div>
-              <label className="text-sm font-bold mb-1 block">
-                Email Address
-              </label>
-
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) =>
-                    handleChange("email", e.target.value)
-                  }
-                  className="w-full pl-8 pr-8 py-2 border rounded-lg"
-                  placeholder=" Enter your email address"
-                />
-              </div>
-
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.email}
-                </p>
-              )}
-            </div>
-
-            {/* PASSWORD */}
-            <div>
-              <label className="text-sm font-bold mb-1 block">
-                Password
-              </label>
-
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 " />
-
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) =>
-                    handleChange("password", e.target.value)
-                  }
-                  className="w-full pl-8 pr-8 py-2 border rounded-lg"
-                  placeholder=" Enter your password"
-                />
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.password}
-                </p>
-              )}
-            </div>
-
-            {/* SUBMIT */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-3 rounded-lg flex items-center justify-center gap-2 disabled:opacity-60  font-bold transition-all shadow-lg active:scale-95 focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)]"
-            >
-              {loading ? "Signing In..." : "Sign In"}
-              <ArrowRight size={18} />
-            </button>
-          </form>
-
-          <p className="mt-6 text-center text-sm">
-            Don't have an account?{" "}
-            <Link to={`/register?redirect=${redirectPath}`}>
-              Create one
-            </Link>
-          </p>
+        {/* EMAIL */}
+        <div>
+          <label className="text-sm">Email</label>
+          <div className="relative mt-1">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+            <input
+              className="w-full pl-10 pr-3 py-2 border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-lg focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
+              value={form.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              placeholder="Enter email"
+            />
+          </div>
+          <FieldError message={errors.email} />
         </div>
-      </section>
-    </main>
+
+        {/* PASSWORD */}
+        <div>
+          <label className="text-sm">Password</label>
+          <div className="relative mt-1">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+
+            <input
+              type={showPassword ? "text" : "password"}
+              className="w-full pl-10 pr-10 py-2 border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-lg focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
+              value={form.password}
+              onChange={(e) => handleChange("password", e.target.value)}
+              placeholder="Enter password"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+          <FieldError message={errors.password} />
+        </div>
+
+        {/* BUTTON */}
+        <button
+          disabled={loading}
+          className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-2 rounded-lg flex items-center justify-center gap-2 font-semibold transition"
+        >
+          {loading ? "Logging in..." : "Login"}
+          <ArrowRight size={16} />
+        </button>
+
+        {/* INFO */}
+        {redirectPath && (
+          <p className="text-xs text-center text-[var(--text-secondary)]">
+            You must login to continue your survey
+          </p>
+        )}
+
+        {/* REGISTER */}
+        <p className="text-center text-sm text-[var(--text-primary)]">
+          Don't have an account?{" "}
+          <Link className="text-[var(--primary)] font-semibold" to={redirectPath ? `/register?redirect=${encodeURIComponent(redirectPath)}` : "/register"}>
+            Register
+          </Link>
+        </p>    
+      </form>
+    </div>
   );
 };
 

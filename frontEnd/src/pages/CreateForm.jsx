@@ -1,215 +1,272 @@
 import React, { useState } from "react";
 import axiosInstance from "../axiosConfig";
-import { PlusCircle, Trash2, Eye } from "lucide-react";
+import { Trash2, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const CreateForm = () => {
   const navigate = useNavigate();
 
+  // ================= STATE =================
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState([]);
 
-  // Add new question
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
+
+  // ================= VALIDATION =================
+  const validate = () => {
+    const err = {};
+
+    if (!title.trim()) err.title = "Form title is required";
+    if (!description.trim()) err.description = "Form description is required";
+    if (questions.length === 0) err.questions = "At least 1 question required";
+
+    questions.forEach((q, i) => {
+      if (!q.questionText?.trim()) {
+        err[`q_${i}`] = "Question text is required";
+      }
+
+      if (
+        (q.questionType === "radio" ||
+          q.questionType === "checkbox" ||
+          q.questionType === "dropdown") &&
+        (!q.options || q.options.length < 2)
+      ) {
+        err[`q_opt_${i}`] = "At least 2 options required";
+      }
+
+      q.options?.forEach((opt, oi) => {
+        if (!opt.trim()) {
+          err[`q_opt_empty_${i}_${oi}`] = "Option cannot be empty";
+        }
+      });
+    });
+
+    return err;
+  };
+
+  // ================= QUESTIONS =================
   const addQuestion = () => {
-    setQuestions([
-      ...questions,
-      { questionText: "", questionType: "text", options: [] },
+    setQuestions((prev) => [
+      ...prev,
+      {
+        questionText: "",
+        questionType: "text",
+        options: [],
+      },
     ]);
   };
 
-  // Delete question
   const deleteQuestion = (index) => {
-    setQuestions(questions.filter((_, i) => i !== index));
+    setQuestions((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handle question change
   const handleQuestionChange = (index, field, value) => {
-    const updated = [...questions];
-    updated[index][field] = value;
-    setQuestions(updated);
-  };
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
 
-  // Add option
-  const addOption = (index) => {
-    const updated = [...questions];
-    updated[index].options.push("");
-    setQuestions(updated);
-  };
+      if (field === "questionType" && (value === "text" || value === "number")) {
+        updated[index].options = [];
+      }
 
-  // Handle option change
-  const handleOptionChange = (qIndex, oIndex, value) => {
-    const updated = [...questions];
-    updated[qIndex].options[oIndex] = value;
-    setQuestions(updated);
-  };
-
-  // Submit form
-  const handleSubmit = async () => {
-  try {
-    await axiosInstance.post("/creator/create-survey", {
-      title,
-      description,
-      questions,
+      return updated;
     });
+  };
 
-    alert("Form created successfully!");
-    navigate("/creator-dashboard");
+  const addOption = (qIndex) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      updated[qIndex] = {
+        ...updated[qIndex],
+        options: [...(updated[qIndex].options || []), ""],
+      };
+      return updated;
+    });
+  };
 
-  } catch (err) {
-    console.error(err);
-    alert("Error creating form");
-  }
-};
+  const handleOptionChange = (qIndex, oIndex, value) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      const options = [...(updated[qIndex].options || [])];
+      options[oIndex] = value;
 
+      updated[qIndex] = { ...updated[qIndex], options };
+      return updated;
+    });
+  };
+
+  // ================= SUBMIT =================
+  const handleSubmit = async () => {
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error("Please fix form errors");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const cleanedQuestions = questions.map((q) => ({
+        questionText: q.questionText,
+        questionType: q.questionType,
+        options: q.options || [],
+      }));
+
+      const res = await axiosInstance.post("/creator/create-survey", {
+        title,
+        description,
+        questions: cleanedQuestions,
+      });
+
+      if (res.status === 200 || res.status === 201) {
+        setShowOverlay(true);
+        toast.success("Survey created 🎉");
+
+        setTimeout(() => navigate("/creator-dashboard"), 1500);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error creating survey");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ================= UI =================
   return (
-    <div className="min-h-screen p-8 bg-[var(--bg-secondary)]">
-      <h1 className="text-3xl font-bold mb-6 text-[var(--text-primary)]">
-        Create New Form
-      </h1>
+    <div className="min-h-screen p-8 bg-[var(--bg-secondary)] text-[var(--text-primary)] font-[var(--font-dyslexia)]">
 
-      {/* Form Settings */}
-      <section
-        className="bg-[var(--bg-primary)] p-6 rounded-xl shadow mb-6"
-        aria-labelledby="form-settings-header"
-      >
-        <h2 id="form-settings-header" className="sr-only">
-          Form Settings
-        </h2>
-
-        <label className="block mb-3 font-semibold text-[var(--text-primary)]">
-          Form Title
-          <input
-            type="text"
-            placeholder="Form Title"
-            value={title}
-            required
-            onChange={(e) => setTitle(e.target.value)}
-            aria-required="true"
-            className="w-full border border-[var(--border)] p-3 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
-          />
-        </label>
-
-        <label className="block font-semibold text-[var(--text-primary)]">
-          Form Description
-          <textarea
-            placeholder="Form Description"
-            value={description}
-            required
-            onChange={(e) => setDescription(e.target.value)}
-            aria-required="true"
-            className="w-full border border-[var(--border)] p-3 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
-          />
-        </label>
-      </section>
-
-      {/* Questions Section */}
-      <section aria-labelledby="questions-header">
-        <h2 id="questions-header" className="sr-only">
-          Questions
-        </h2>
-
-        {questions.map((q, index) => (
-          <div
-            key={index}
-            className="bg-[var(--bg-primary)] p-6 rounded-xl shadow mb-4"
-          >
-            <label className="block mb-2 font-semibold text-[var(--text-primary)]">
-              Question Text
-              <input
-                type="text"
-                placeholder="Question text"
-                value={q.questionText}
-                onChange={(e) =>
-                  handleQuestionChange(index, "questionText", e.target.value)
-                }
-                aria-required="true"
-                required
-                className="w-full border border-[var(--border)] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
-              />
-            </label>
-
-            <label className="block mb-3 font-semibold text-[var(--text-primary)]">
-              Question Type
-              <select
-                value={q.questionType}
-                onChange={(e) =>
-                  handleQuestionChange(index, "questionType", e.target.value)
-                }
-                className="w-full border border-[var(--border)] p-2 text-[var(--text-primary)] bg-[var(--bg-secondary)] rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
-                aria-label={`Select type for question ${index + 1}`}
-              >
-                <option value="text">Text</option>
-                <option value="email">Email</option>
-                <option value="number">Number</option>
-                <option value="radio">Radio</option>
-                <option value="checkbox">Checkbox</option>
-                <option value="dropdown">Dropdown</option>
-              </select>
-            </label>
-
-            {(q.questionType === "radio" ||
-              q.questionType === "checkbox" ||
-              q.questionType === "dropdown") && (
-              <div>
-                {q.options.map((opt, i) => (
-                  <label key={i} className="block mb-2">
-                    <input
-                      type="text"
-                      placeholder="Option"
-                      required
-                      value={opt}
-                      onChange={(e) =>
-                        handleOptionChange(index, i, e.target.value)
-                      }
-                      aria-label={`Option ${i + 1} for question ${index + 1}`}
-                      className="w-full border border-[var(--border)] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
-                    />
-                  </label>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addOption(index)}
-                  className="text-blue-600 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded inline-flex items-center gap-1"
-                  aria-label={`Add option to question ${index + 1}`}
-                >
-                  <PlusCircle size={16} /> Add Option
-                </button>
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={() => deleteQuestion(index)}
-              className="text-red-600 mt-3 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded"
-              aria-label={`Delete question ${index + 1}`}
-            >
-              <Trash2 size={16} /> Delete Question
-            </button>
+      {/* OVERLAY */}
+      {showOverlay && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-[var(--bg-primary)] p-6 rounded-xl shadow border border-[var(--border)] text-center">
+            <h2 className="text-[var(--primary)] font-bold text-lg">
+              Survey Created 🎉
+            </h2>
+            <p className="text-[var(--text-secondary)]">Redirecting...</p>
           </div>
-        ))}
+        </div>
+      )}
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-[var(--text-primary)]">
+          Create New Survey
+        </h1>
 
         <button
-          type="button"
-          onClick={addQuestion}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
-          aria-label="Add new question"
+          onClick={() => navigate("/creator-dashboard")}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border)] hover:opacity-[var(--btn-hover)] transition cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
         >
-          <PlusCircle size={18} /> Add Question
-        </button>
-      </section>
-
-      {/* Actions */}
-      <div className="mt-6 flex gap-4 flex-wrap">
-        <button
-          type="button"
-          onClick={handleSubmit}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] transition-all"
-          aria-label="Save form"
-        >
-          Save Form
+          <ArrowLeft size={16} />
+          Back to Dashboard
         </button>
       </div>
+
+      {/* TITLE + DESCRIPTION */}
+      <div className="bg-[var(--bg-primary)] p-6 rounded-xl border border-[var(--border)] mb-6">
+
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Survey title"
+          className="w-full p-3 mb-2 rounded bg-[var(--bg-secondary)] border border-[var(--border)] outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+        />
+        {errors.title && <p className="text-[var(--status-inactive-text)]">{errors.title}</p>}
+
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Survey description"
+          className="w-full p-3 mt-3 rounded bg-[var(--bg-secondary)] border border-[var(--border)] outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
+        />
+        {errors.description && <p className="text-[var(--status-inactive-text)]">{errors.description}</p>}
+
+      </div>
+
+      {/* QUESTIONS */}
+      {questions.map((q, index) => (
+        <div
+          key={index}
+          className="bg-[var(--bg-primary)] p-5 rounded-xl border border-[var(--border)] mb-4"
+        >
+
+          <input
+            value={q.questionText}
+            onChange={(e) =>
+              handleQuestionChange(index, "questionText", e.target.value)
+            }
+            placeholder="Question"
+            className="w-full p-2 mb-2 bg-[var(--bg-secondary)] border border-[var(--border)] rounded"
+          />
+
+          <select
+            value={q.questionType}
+            onChange={(e) =>
+              handleQuestionChange(index, "questionType", e.target.value)
+            }
+            className="w-full p-2 mb-2 bg-[var(--bg-secondary)] border border-[var(--border)] rounded"
+          >
+            <option value="text">Text</option>
+            <option value="number">Number</option>
+            <option value="radio">Radio</option>
+            <option value="checkbox">Checkbox</option>
+            <option value="dropdown">Dropdown</option>
+          </select>
+
+          {/* OPTIONS */}
+          {(q.questionType !== "text" && q.questionType !== "number") &&
+            (q.options || []).map((opt, i) => (
+              <input
+                key={i}
+                value={opt}
+                onChange={(e) =>
+                  handleOptionChange(index, i, e.target.value)
+                }
+                className="w-full p-2 mb-1 bg-[var(--bg-secondary)] border border-[var(--border)] rounded"
+                placeholder="Option"
+              />
+            ))}
+
+          {(q.questionType !== "text" && q.questionType !== "number") && (
+            <button
+              onClick={() => addOption(index)}
+              className="text-[var(--primary)] mt-2"
+            >
+              + Add Option
+            </button>
+          )}
+
+          <button
+            onClick={() => deleteQuestion(index)}
+            className="flex items-center gap-1 mt-3 text-[var(--status-inactive-text)] cursor-pointer"
+          >
+            <Trash2 size={14} /> Delete
+          </button>
+
+        </div>
+      ))}
+
+      {/* ACTIONS */}
+      <button
+        onClick={addQuestion}
+        className="bg-[var(--primary)] text-[var(--text-on-primary)] px-4 py-2 rounded mr-3 hover:bg-[var(--primary-dark)] cursor-pointer transition"
+      >
+        + Add Question
+      </button>
+
+      <button
+        onClick={handleSubmit}
+        disabled={loading}
+        className="bg-[var(--primary-dark)] text-[var(--text-on-primary)] px-6 py-2 rounded disabled:opacity-50 cursor-pointer transition"
+      >
+        {loading ? "Saving..." : "Save Survey"}
+      </button>
     </div>
   );
 };

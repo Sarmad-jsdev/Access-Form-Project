@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Navbar from "./Components/Navbar";
 import Footer from "./Components/footer";
 import Home from "./pages/Home";
@@ -15,7 +16,6 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CreatorDashboard from "./pages/CreatorDashboard";
 import Respondant from "./pages/Respondant";
 import CreateForm from "./pages/CreateForm";
-import EditSurvey from "./pages/EditSurvey";
 import PreviewSurvey from "./pages/PreviewSurvey";
 import SurveyAnalytics from "./pages/SurveyAnalytics";
 import SurveyPage from "./pages/SurveyPage";
@@ -24,6 +24,18 @@ const App = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
+        {/* Toaster */}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              background: "var(--bg-primary)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border)",
+            },
+          }}
+        />
+
         {/* Navbar yahan Routes se bahar hai, isliye har page par dikhega */}
         <Navbar />
 
@@ -46,7 +58,14 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          <Route path="/survey/:id" element={<ProtectedRoute><SurveyPage /></ProtectedRoute >} />
+          <Route
+            path="/survey/:id"
+            element={
+              <ProtectedRoute>
+                <SurveyPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/AdminDashboard"
             element={
@@ -72,30 +91,17 @@ const App = () => {
             }
           />
           <Route
-            path="/edit/:id"
+            path="/preview/:id"
             element={
               <ProtectedRoute role="creator">
-                <EditSurvey />
+                <PreviewSurvey />
               </ProtectedRoute>
             }
-          />
-          <Route
-  path="/preview/:id"
-  element={
-    <ProtectedRoute role="creator">
-      <PreviewSurvey />
-    </ProtectedRoute>
-  }
-/>      <Route
-  path="/analytics/:id"
-  element={
-    <ProtectedRoute role="creator">
-      <SurveyAnalytics />
-    </ProtectedRoute>
-  }
-/>
+          />{" "}
+          <Route path="/creator/analytics/:id" element={<ProtectedRoute><SurveyAnalytics /></ProtectedRoute>} />
         </Routes>
 
+        {/* Footer yahan Routes se bahar hai, isliye har page par dikhega */} 
         <Footer />
       </AuthProvider>
     </BrowserRouter>

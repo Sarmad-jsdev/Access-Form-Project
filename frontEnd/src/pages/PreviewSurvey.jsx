@@ -5,17 +5,17 @@ import { useParams, useNavigate } from "react-router-dom";
 const PreviewSurvey = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [survey, setSurvey] = useState(null);
 
+  const [survey, setSurvey] = useState(null);
   const headingRef = useRef(null);
 
+  // =========================
+  // FETCH SURVEY
+  // =========================
   useEffect(() => {
     const fetchSurvey = async () => {
       try {
-        const res = await axiosInstance.get(
-          `/creator/survey/${id}`,
-          {}
-        );
+        const res = await axiosInstance.get(`/creator/survey/${id}`);
         setSurvey(res.data);
       } catch (error) {
         console.error("Error fetching survey:", error);
@@ -25,13 +25,18 @@ const PreviewSurvey = () => {
     fetchSurvey();
   }, [id]);
 
-  // Focus heading when survey loads
+  // =========================
+  // FOCUS TITLE (A11Y)
+  // =========================
   useEffect(() => {
     if (survey && headingRef.current) {
       headingRef.current.focus();
     }
   }, [survey]);
 
+  // =========================
+  // LOADING STATE
+  // =========================
   if (!survey) {
     return (
       <div
@@ -39,116 +44,149 @@ const PreviewSurvey = () => {
         role="status"
         aria-live="polite"
       >
-        <p className="text-[var(--text-primary)]">Loading survey...</p>
+        <p className="text-[var(--text-primary)]">
+          Loading survey...
+        </p>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen p-8 bg-[var(--bg-secondary)]">
-      
-      {/* Back Button */}
+    <main className="min-h-screen p-8 bg-[var(--bg-secondary)] font-[var(--font-dyslexia)]">
+
+      {/* =========================
+          BACK BUTTON
+      ========================= */}
       <button
-        type="button"
         onClick={() => navigate("/creator-dashboard")}
-        className="mb-6 px-4 py-2 rounded-lg 
-                   bg-[var(--bg-primary)] 
-                   text-[var(--text-primary)] 
-                   border border-[var(--border)]
-                   focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
-        aria-label="Back to Dashboard"
+        className="
+          mb-6 px-4 py-2 rounded-lg
+          bg-[var(--bg-primary)]
+          text-[var(--text-primary)]
+          border border-[var(--border)]
+          hover:opacity-90
+          focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]
+        "
       >
         ← Back to Dashboard
       </button>
 
+      {/* =========================
+          MAIN CARD
+      ========================= */}
       <section
-        className="bg-[var(--bg-primary)] p-8 rounded-xl shadow max-w-3xl mx-auto"
+        className="
+          bg-[var(--bg-primary)]
+          p-8 rounded-xl shadow
+          max-w-3xl mx-auto
+          border border-[var(--border)]
+        "
         aria-labelledby="preview-heading"
       >
+
+        {/* TITLE */}
         <h1
           id="preview-heading"
           ref={headingRef}
           tabIndex="-1"
-          className="text-3xl font-bold mb-2 text-[var(--text-primary)] focus:outline-none"
+          className="
+            text-3xl font-bold mb-2
+            text-[var(--text-primary)]
+            outline-none
+          "
         >
           {survey.title}
         </h1>
 
+        {/* DESCRIPTION */}
         <p className="text-[var(--text-secondary)] mb-6">
           {survey.description}
         </p>
 
-        {/* Questions */}
-        {survey.questions && survey.questions.length > 0 ? (
+        {/* =========================
+            QUESTIONS
+        ========================= */}
+        {survey.questions?.length > 0 ? (
           survey.questions.map((q, i) => (
             <div key={i} className="mb-8">
 
-              {/* Use fieldset for grouped inputs */}
+              {/* RADIO / CHECKBOX */}
               {(q.questionType === "radio" ||
-                q.questionType === "checkbox") ? (
-                <fieldset className="border border-[var(--border)] p-4 rounded">
+                q.questionType === "checkbox") && (
+                <fieldset
+                  className="
+                    border border-[var(--border)]
+                    p-4 rounded-lg
+                  "
+                >
                   <legend className="font-semibold text-[var(--text-primary)] mb-3">
                     {q.questionText}
                   </legend>
 
                   {q.options?.map((opt, index) => (
-                    <div key={index} className="flex items-center gap-2 mb-2">
+                    <label
+                      key={index}
+                      className="flex items-center gap-2 mb-2 text-[var(--text-primary)]"
+                    >
                       <input
                         type={q.questionType}
                         disabled
-                        aria-disabled="true"
-                        className="focus:ring-2 focus:ring-[var(--focus-ring)]"
+                        className="accent-[var(--primary)]"
                       />
-                      <span className="text-[var(--text-primary)]">
-                        {opt}
-                      </span>
-                    </div>
+                      {opt}
+                    </label>
                   ))}
                 </fieldset>
-              ) : q.questionType === "dropdown" ? (
+              )}
+
+              {/* DROPDOWN */}
+              {q.questionType === "dropdown" && (
                 <div>
-                  <label
-                    className="block font-semibold mb-2 text-[var(--text-primary)]"
-                  >
+                  <label className="block font-semibold mb-2 text-[var(--text-primary)]">
                     {q.questionText}
                   </label>
 
                   <select
                     disabled
-                    aria-disabled="true"
-                    className="w-full border border-[var(--border)] p-2 rounded
-                               bg-[var(--bg-secondary)] text-[var(--text-primary)]"
+                    className="
+                      w-full p-2 rounded-lg
+                      bg-[var(--bg-secondary)]
+                      text-[var(--text-primary)]
+                      border border-[var(--border)]
+                    "
                   >
-                    {q.options?.map((enyu, index) => (
-                      <option key={index}>{enyu}</option>
+                    {q.options?.map((opt, i) => (
+                      <option key={i}>{opt}</option>
                     ))}
                   </select>
                 </div>
-              ) : (
-                <div>
-                  <label
-                    className="block font-semibold mb-2 text-[var(--text-primary)]"
-                  >
-                    {q.questionText}
-                  </label>
-
-                  <input
-                    type={q.questionType}
-                    disabled
-                    aria-disabled="true"
-                    className="w-full border border-[var(--border)] p-2 rounded
-                               bg-[var(--bg-secondary)] text-[var(--text-primary)]"
-                  />
-                </div>
               )}
+
+              {/* TEXT / NUMBER / EMAIL */}
+              {q.questionType !== "radio" &&
+                q.questionType !== "checkbox" &&
+                q.questionType !== "dropdown" && (
+                  <div>
+                    <label className="block font-semibold mb-2 text-[var(--text-primary)]">
+                      {q.questionText}
+                    </label>
+
+                    <input
+                      type={q.questionType}
+                      disabled
+                      className="
+                        w-full p-2 rounded-lg
+                        bg-[var(--bg-secondary)]
+                        text-[var(--text-primary)]
+                        border border-[var(--border)]
+                      "
+                    />
+                  </div>
+                )}
             </div>
           ))
         ) : (
-          <p
-            className="text-[var(--text-secondary)]"
-            role="status"
-            aria-live="polite"
-          >
+          <p className="text-[var(--text-secondary)]">
             No questions found in this survey.
           </p>
         )}

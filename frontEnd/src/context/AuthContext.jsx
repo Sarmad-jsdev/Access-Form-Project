@@ -7,6 +7,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // =========================
+  // AUTO LOAD USER ON REFRESH
+  // =========================
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -14,22 +17,26 @@ export const AuthProvider = ({ children }) => {
 
         if (!token) {
           setUser(null);
-          setLoading(false); // FIXED
+          setLoading(false);
           return;
         }
 
         const res = await axiosInstance.get("/auth/me");
+
         setUser(res.data);
       } catch (err) {
         setUser(null);
       } finally {
-        setLoading(false); // ALWAYS STOP LOADING
+        setLoading(false);
       }
     };
 
     fetchUser();
   }, []);
 
+  // =========================
+  // LOGIN FUNCTION
+  // =========================
   const login = async (email, password) => {
     const res = await axiosInstance.post("/auth/login", {
       email,
@@ -42,13 +49,23 @@ export const AuthProvider = ({ children }) => {
     return res.data.user;
   };
 
+  // =========================
+  // REGISTER AUTO LOGIN HELPER
+  // =========================
+  const setAuthAfterLogin = (user, token) => {
+    localStorage.setItem("token", token);
+    setUser(user);
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, loading, setAuthAfterLogin }}
+    >
       {children}
     </AuthContext.Provider>
   );

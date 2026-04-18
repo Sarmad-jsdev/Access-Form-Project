@@ -31,8 +31,8 @@ export const loginUser = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
-  console.log("🔥 LOGIN ERROR FULL:", error);
-  console.log("STACK:", error.stack);
+    console.log("🔥 LOGIN ERROR FULL:", error);
+    console.log("STACK:", error.stack);
   }
 };
 
@@ -40,30 +40,88 @@ export const logoutUser = (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
+// Register user
+
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    let { name, email, password, role } = req.body;
 
+    // ✅ Trim inputs
+    name = name?.trim();
+    email = email?.trim().toLowerCase();
+
+    // ✅ Required fields
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // ✅ Name validation
+    if (name.length < 3) {
+      return res
+        .status(400)
+        .json({ message: "Name must be at least 3 characters" });
+    }
+
+    // ✅ Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // ✅ Password validation
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 6 characters" });
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      return res
+        .status(400)
+        .json({ message: "Password must contain 1 uppercase letter" });
+    }
+
+    if (!/[0-9]/.test(password)) {
+      return res
+        .status(400)
+        .json({ message: "Password must contain 1 number" });
+    }
+
+    // ❌ Block admin creation
     if (role === "admin") {
       return res.status(403).json({ message: "Cannot register as admin" });
     }
 
+    // ✅ Default role FIX (IMPORTANT BUG)
+    const allowedRoles = ["creator", "respondent"];
+    if (!allowedRoles.includes(role)) {
+      role = "respondent";
+    }
+
+    // ✅ Check existing email
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).json({ message: "Email already exists" });
     }
 
+    // ✅ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
-      role: role || "user", // ✅ default role
+      role,
+    });
+
+    // ✅ Generate token (optional, can be used for auto-login after registration)
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
     });
 
     res.status(201).json({
       message: "Registered successfully",
+      token, // 🔥 ADD THIS
       user: {
         id: user._id,
         name: user.name,
@@ -72,6 +130,7 @@ export const registerUser = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("REGISTER ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

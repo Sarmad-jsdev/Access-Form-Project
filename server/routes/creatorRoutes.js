@@ -82,30 +82,6 @@ router.delete("/delete-survey/:id", authMiddleware, async (req, res) => {
   }
 });
 
-// ✅ Edit survey
-router.put("/edit-survey/:id", authMiddleware, async (req, res) => {
-  try {
-    if (req.user.role !== "creator") {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
-    const { title, description, questions, isActive } = req.body;
-
-    const survey = await Survey.findOneAndUpdate(
-      { _id: req.params.id, creator: req.user.id },
-      { title, description, questions, isActive },
-      { new: true }
-    );
-
-    if (!survey) {
-      return res.status(404).json({ message: "Survey not found" });
-    }
-
-    res.json(survey);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 // ✅ Preview survey (get by ID)
 router.get("/survey/:id", authMiddleware, async (req, res) => {
@@ -123,7 +99,7 @@ router.get("/survey/:id", authMiddleware, async (req, res) => {
 });
 
 // ✅ Get survey analytics
-router.get("/survey-analytics/:id", authMiddleware, async (req, res) => {
+router.get("/analytics/:id", authMiddleware, async (req, res) => {
   try {
 
     if (req.user.role !== "creator") {
@@ -164,4 +140,37 @@ router.get("/survey-analytics/:id", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+
+// ✅ Toggle survey active/inactive
+router.patch("/toggle-survey/:id", authMiddleware, async (req, res) => {
+  try {
+    if (req.user.role !== "creator") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const survey = await Survey.findOne({
+      _id: req.params.id,
+      creator: req.user.id,
+    });
+
+    if (!survey) {
+      return res.status(404).json({ message: "Survey not found" });
+    }
+
+    survey.isActive = !survey.isActive;
+    await survey.save();
+
+    res.json({
+      message: `Survey ${survey.isActive ? "activated" : "deactivated"}`,
+      isActive: survey.isActive,
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
 export default router;
