@@ -90,7 +90,7 @@ const Navbar = () => {
                   ${
                     isActive
                       ? "bg-[var(--primary)] text-white"
-                      : "text-[var(--text-secondary)]"
+                      : "text-[var(--text-on primary)]"
                   }
                 `}
               >
@@ -99,7 +99,7 @@ const Navbar = () => {
             ))}
 
             <div className="flex flex-col gap-2 pt-3">
-              <Link to="/login" className="px-4 py-2 rounded-lg bg-[var(--primary)] text-white text-center">
+              <Link to="/login" className="px-4 py-2 rounded-lg bg-[var(--primary)] text-[var(--text-on-primary)] text-center">
                 Login
               </Link>
               <Link to="/register" className="px-4 py-2 rounded-lg border border-[var(--primary)] text-[var(--primary)] text-center">
