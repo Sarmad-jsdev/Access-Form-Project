@@ -9,6 +9,10 @@ const surveySchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     isActive: { type: Boolean, default: true },
     questions: [
       {

@@ -1,7 +1,7 @@
 # Access‑Form‑Project
 
 A web application for collecting user access form data with frontend and backend support.  
-This project includes a frontend UI and a backend server for handling form submissions.
+This project includes a frontend UI and a backend server for handling form submissions.  
 
 👉 **Live Preview:** https://accessform-chi.vercel.app
 
@@ -23,7 +23,7 @@ This project includes a frontend UI and a backend server for handling form submi
 ## 📌 About
 
 Access‑Form‑Project is a full‑stack application that allows users to fill out an access request form.  
-The frontend is built with HTML, CSS, and JavaScript, while the backend handles saving form data and routing.
+The frontend is built with HTML, CSS, and JavaScript, while the backend handles saving form data and routing. 
 
 ---
 

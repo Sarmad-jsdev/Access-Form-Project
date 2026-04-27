@@ -5,209 +5,131 @@ import {
   Eye,
   BarChart,
   PlusCircle,
-  Pencil,
   Trash2,
   Copy,
+  FileText,
+  Activity,
+  TrendingUp,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import DashboardLayout from "../Components/DashboardLayout";
+
+/* ─── small stat card ─────────────────────────────────────── */
+const StatCard = ({ label, value, icon: Icon, accent }) => (
+  <div className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5 flex items-center gap-4">
+    <div
+      className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+      style={{ background: accent + "18" }}
+    >
+      <Icon size={20} style={{ color: accent }} />
+    </div>
+    <div>
+      <p className="text-xs text-[var(--text-secondary)] font-medium">{label}</p>
+      <p className="text-2xl font-bold text-[var(--text-primary)] leading-tight">{value}</p>
+    </div>
+  </div>
+);
 
 const CreatorDashboard = () => {
-  // =========================
-  // STATE MANAGEMENT
-  // =========================
   const [surveys, setSurveys] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ totalSurveys: 0, activeSurveys: 0, totalResponses: 0 });
 
-  const [stats, setStats] = useState({
-    totalSurveys: 0,
-    activeSurveys: 0,
-    totalResponses: 0,
-  });
-
-  // =========================
-  // FETCH ALL SURVEYS
-  // =========================
   const fetchSurveys = async () => {
     try {
       setLoading(true);
-
       const res = await axiosInstance.get("/creator/my-surveys");
-
       setSurveys(res.data.surveys || []);
       setStats(res.data.stats || stats);
-    } catch (err) {
+    } catch {
       toast.error("Failed to load surveys");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchSurveys();
-  }, []);
+  useEffect(() => { fetchSurveys(); }, []);
 
-  // =========================
-  // COPY SURVEY LINK
-  // =========================
   const handleCopyLink = (id) => {
-    const link = `${window.location.origin}/survey/${id}`;
-    navigator.clipboard.writeText(link);
-
-    toast.success("Link copied 📋", {
-      position: "top-center",
-    });
+    navigator.clipboard.writeText(`${window.location.origin}/survey/${id}`);
+    toast.success("Link copied 📋", { position: "top-center" });
   };
 
-  // =========================
-  // DELETE SURVEY
-  // =========================
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this survey?")) return;
-
     try {
       await axiosInstance.delete(`/creator/delete-survey/${id}`);
-
       toast.success("Survey deleted");
       fetchSurveys();
-    } catch (err) {
+    } catch {
       toast.error("Delete failed");
     }
   };
 
-  // =========================
-  // TOGGLE ACTIVE / INACTIVE
-  // =========================
   const toggleStatus = async (id) => {
     try {
       await axiosInstance.patch(`/creator/toggle-survey/${id}`);
-
       toast.success("Status updated");
       fetchSurveys();
-    } catch (err) {
+    } catch {
       toast.error("Failed to update status");
     }
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-secondary)] p-8 font-[var(--font-dyslexia)]">
+    <DashboardLayout title="Creator Dashboard">
 
-      {/* =========================
-          HEADER SECTION
-      ========================= */}
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-[var(--text-primary)]">
-          Creator Dashboard
-        </h1>
+      {/* Stats row */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <StatCard label="Total Surveys" value={stats.totalSurveys} icon={FileText} accent="var(--primary)" />
+        <StatCard label="Active Surveys" value={stats.activeSurveys} icon={Activity} accent="#22c55e" />
+        <StatCard label="Total Responses" value={stats.totalResponses} icon={TrendingUp} accent="#f59e0b" />
+      </div>
 
-        {/* CREATE BUTTON */}
+      {/* Section header */}
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-base font-semibold text-[var(--text-primary)]">Your Surveys</h2>
         <Link
           to="/CreateForm"
-          className="flex items-center gap-2 bg-[var(--primary)] text-[var(--text-on-primary)] px-5 py-2 rounded-lg shadow hover:scale-105 transition"
+          className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg text-white transition"
+          style={{ background: "var(--primary)" }}
         >
-          <PlusCircle size={18} />
-          Create Survey
+          <PlusCircle size={15} /> New Survey
         </Link>
-      </header>
+      </div>
 
-      {/* =========================
-          STATS SECTION
-      ========================= */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-
-        <StatCard label="Total Surveys" value={stats.totalSurveys} />
-        <StatCard label="Active Surveys" value={stats.activeSurveys} />
-        <StatCard label="Responses" value={stats.totalResponses} />
-
-      </section>
-
-      {/* =========================
-          LOADING STATE
-      ========================= */}
+      {/* Loading */}
       {loading && (
-        <p className="text-[var(--text-secondary)]">
-          Loading surveys...
-        </p>
+        <p className="text-[var(--text-secondary)] text-sm">Loading surveys…</p>
       )}
 
-      {/* =========================
-          EMPTY STATE
-      ========================= */}
+      {/* Empty state */}
       {!loading && surveys.length === 0 && (
         <div className="text-center py-20 text-[var(--text-secondary)]">
-          <p>No surveys created yet</p>
-
-          <Link
-            to="/CreateForm"
-            className="text-[var(--primary)] font-semibold mt-3 inline-block"
-          >
+          <FileText size={36} className="mx-auto mb-3 opacity-30" />
+          <p className="mb-3">No surveys yet</p>
+          <Link to="/CreateForm" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>
             Create your first survey →
           </Link>
         </div>
       )}
 
-      {/* =========================
-          SURVEY CARDS
-      ========================= */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
+      {/* Survey cards grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {surveys.map((survey) => (
           <div
             key={survey._id}
-            className="bg-[var(--bg-primary)] p-6 rounded-2xl shadow border border-[var(--border)] hover:shadow-lg transition"
+            className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5 flex flex-col gap-4 hover:shadow-md transition"
           >
-
-            {/* TITLE */}
-            <h2 className="text-xl font-bold text-[var(--text-primary)]">
-              {survey.title}
-            </h2>
-
-            <p className="text-[var(--text-secondary)] mt-2">
-              {survey.description}
-            </p>
-
-            {/* ACTION BUTTONS */}
-            <div className="flex flex-wrap gap-2 mt-5">
-
-              {/* PREVIEW */}
-              <Link
-                to={`/preview/${survey._id}`}
-                className="bg-[var(--btn-preview)] text-[var(--text-on-primary)] px-3 py-1.5 rounded text-sm flex items-center gap-1"
-              >
-                <Eye size={14} /> Preview
-              </Link>
-
-
-              {/* ⚠ FIXED ANALYTICS ROUTE */}
-              <Link
-                to={`/creator/analytics/${survey._id}`}
-                className="bg-[var(--btn-analytics)] text-[var(--text-on-primary)] px-3 py-1.5 rounded text-sm flex items-center gap-1"
-              >
-                <BarChart size={14} /> Analytics
-              </Link>
-
-              {/* DELETE */}
-              <button
-                onClick={() => handleDelete(survey._id)}
-                className="bg-[var(--btn-warning)] text-[var(--text-on-primary)] px-3 py-1.5 rounded text-sm flex items-center gap-1 cursor-pointer"
-              >
-                <Trash2 size={14} /> Delete
-              </button>
-
-              {/* COPY LINK */}
-              <button
-                onClick={() => handleCopyLink(survey._id)}
-                className="bg-[var(--btn-success)] text-[var(--text-on-primary)] px-3 py-1.5 rounded text-sm flex items-center gap-1 cursor-pointer"
-              >
-                <Copy size={14} /> Copy
-              </button>
-
-
-            </div>
-
-            {/* STATUS BADGE */}
-            <div className="mt-4">
+            {/* Card header */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-[var(--text-primary)] truncate">{survey.title}</h3>
+                <p className="text-xs text-[var(--text-secondary)] mt-1 line-clamp-2">{survey.description}</p>
+              </div>
+              {/* Status badge */}
               <span
-                className={`px-3 py-1 text-xs rounded-full ${
+                className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
                   survey.isActive
                     ? "bg-[var(--status-active-bg)] text-[var(--status-active-text)]"
                     : "bg-[var(--status-inactive-bg)] text-[var(--status-inactive-text)]"
@@ -217,23 +139,50 @@ const CreatorDashboard = () => {
               </span>
             </div>
 
+            {/* Toggle active button */}
+            <button
+              onClick={() => toggleStatus(survey._id)}
+              className="text-xs text-[var(--text-secondary)] underline underline-offset-2 text-left w-fit"
+            >
+              {survey.isActive ? "Deactivate" : "Activate"}
+            </button>
+
+            {/* Action buttons */}
+            <div className="flex flex-wrap gap-2 pt-1 border-t border-[var(--border)]">
+              <Link
+                to={`/preview/${survey._id}`}
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                style={{ background: "var(--btn-preview, #3b82f6)", color: "#fff" }}
+              >
+                <Eye size={12} /> Preview
+              </Link>
+              <Link
+                to={`/creator/analytics/${survey._id}`}
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                style={{ background: "var(--btn-analytics, #8b5cf6)", color: "#fff" }}
+              >
+                <BarChart size={12} /> Analytics
+              </Link>
+              <button
+                onClick={() => handleCopyLink(survey._id)}
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                style={{ background: "var(--btn-success, #22c55e)", color: "#fff" }}
+              >
+                <Copy size={12} /> Copy Link
+              </button>
+              <button
+                onClick={() => handleDelete(survey._id)}
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                style={{ background: "var(--btn-warning, #ef4444)", color: "#fff" }}
+              >
+                <Trash2 size={12} /> Delete
+              </button>
+            </div>
           </div>
         ))}
-      </section>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 };
-
-/* =========================
-   STATS COMPONENT
-========================= */
-const StatCard = ({ label, value }) => (
-  <div className="bg-[var(--bg-primary)] p-6 rounded-2xl shadow border border-[var(--border)]">
-    <p className="text-[var(--text-secondary)]">{label}</p>
-    <h2 className="text-2xl font-bold text-[var(--text-primary)]">
-      {value}
-    </h2>
-  </div>
-);
 
 export default CreatorDashboard;

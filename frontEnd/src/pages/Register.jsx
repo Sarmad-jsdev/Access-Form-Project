@@ -116,7 +116,7 @@ const Register = () => {
           navigate(path, { replace: true }); // 🎯 SURVEY ALWAYS WORKS
         } else {
           if (user.role === "admin") navigate("/AdminDashboard");
-          else if (user.role === "creator") navigate("/creator-dashboard");
+          else if (user.role === "creator") navigate("/CreatorDashboard");
           else navigate("/Respondent");
         }
       }, 1200);

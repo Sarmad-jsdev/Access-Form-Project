@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../axiosConfig";
 import { AuthContext } from "../context/AuthContext";
 import toast from "react-hot-toast";
+import { ArrowLeft } from "lucide-react";
+import DashboardLayout from "../Components/DashboardLayout";
 
 const SurveyPage = () => {
   const { id } = useParams();
@@ -10,24 +12,18 @@ const SurveyPage = () => {
 
   const [survey, setSurvey] = useState(null);
   const [answers, setAnswers] = useState({});
-  const [fieldErrors, setFieldErrors] = useState({});
+  const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // =========================
-  // FETCH SURVEY
-  // =========================
+  // ================= FETCH =================
   useEffect(() => {
     const fetchSurvey = async () => {
       try {
-        const res = await axiosInstance.get(
-          `/respondent/survey/${id}/fill`
-        );
+        const res = await axiosInstance.get(`/respondent/survey/${id}/fill`);
         setSurvey(res.data);
       } catch (err) {
-        const msg =
-          err.response?.data?.message || "Failed to load survey";
-
+        const msg = err.response?.data?.message || "Failed to load survey";
         toast.error(msg);
 
         if (err.response?.status === 403) {
@@ -39,30 +35,17 @@ const SurveyPage = () => {
     if (!loading && user) fetchSurvey();
   }, [user, loading, id]);
 
-  const questions = useMemo(() => survey?.questions || [], [survey]);
-
-  // =========================
-  // HANDLE CHANGE
-  // =========================
+  // ================= CHANGE =================
   const handleChange = (q, value) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [q._id]: value,
-    }));
-
-    setFieldErrors((prev) => ({
-      ...prev,
-      [q._id]: "",
-    }));
+    setAnswers((prev) => ({ ...prev, [q._id]: value }));
+    setErrors((prev) => ({ ...prev, [q._id]: "" }));
   };
 
-  // =========================
-  // VALIDATION
-  // =========================
+  // ================= VALIDATION =================
   const validate = () => {
-    const errors = {};
+    const err = {};
 
-    questions.forEach((q) => {
+    survey.questions.forEach((q) => {
       const val = answers[q._id];
 
       if (
@@ -71,27 +54,26 @@ const SurveyPage = () => {
         val === null ||
         (Array.isArray(val) && val.length === 0)
       ) {
-        errors[q._id] = "This field is required";
+        err[q._id] = "This field is required";
         return;
       }
 
       if (q.questionType === "email") {
-        const emailRegex = /\S+@\S+\.\S+/;
-        if (!emailRegex.test(val)) {
-          errors[q._id] = "Invalid email format";
+        if (!/\S+@\S+\.\S+/.test(val)) {
+          err[q._id] = "Invalid email format";
         }
       }
 
       if (q.questionType === "number") {
         if (isNaN(val)) {
-          errors[q._id] = "Must be a number";
+          err[q._id] = "Must be a number";
         }
       }
     });
 
-    setFieldErrors(errors);
+    setErrors(err);
 
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(err).length > 0) {
       toast.error("Please fix errors");
       return false;
     }
@@ -99,22 +81,19 @@ const SurveyPage = () => {
     return true;
   };
 
-  // =========================
-  // SUBMIT
-  // =========================
+  // ================= SUBMIT =================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (submitted) {
-      return toast.error("You already submitted this survey");
+      return toast.error("Already submitted");
     }
 
     if (submitting) return;
 
     if (!validate()) return;
 
-    const formatted = questions.map((q) => ({
-      questionId: q._id,
+    const formatted = survey.questions.map((q) => ({
       questionText: q.questionText,
       answer: answers[q._id],
     }));
@@ -127,18 +106,13 @@ const SurveyPage = () => {
         { answers: formatted }
       );
 
-      toast.success(
-        res.data?.message || "Survey submitted successfully!"
-      );
-
+      toast.success(res.data?.message || "Submitted successfully!");
       setSubmitted(true);
       setSurvey(null);
       setAnswers({});
-      setFieldErrors({});
+      setErrors({});
     } catch (err) {
-      const msg =
-        err.response?.data?.message || "Submission failed";
-
+      const msg = err.response?.data?.message || "Submission failed";
       toast.error(msg);
 
       if (err.response?.status === 403) {
@@ -149,88 +123,82 @@ const SurveyPage = () => {
     }
   };
 
-  // =========================
-  // LOADING
-  // =========================
+  // ================= STATES =================
+
   if (loading) {
     return (
-      <div className="p-8 text-[var(--text-secondary)]">
-        Loading...
-      </div>
+      <DashboardLayout title="">
+        <p className="text-[var(--text-secondary)] text-sm">Loading...</p>
+      </DashboardLayout>
     );
   }
 
   if (!survey && !submitted) {
     return (
-      <div className="p-8 text-[var(--status-inactive-text)] font-semibold">
-        Survey not found
-      </div>
+      <DashboardLayout title="">
+        <p className="text-[var(--text-secondary)] text-sm">
+          Survey not found
+        </p>
+      </DashboardLayout>
     );
   }
 
-  // =========================
-  // ALREADY SUBMITTED
-  // =========================
   if (submitted) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center text-center p-8 bg-[var(--bg-secondary)]">
-        <h2 className="text-xl font-bold text-[var(--status-inactive-text)]">
-          You have already submitted this survey
-        </h2>
-        <p className="text-[var(--text-secondary)] mt-2">
-          Thank you for your response
-        </p>
-      </div>
+      <DashboardLayout title="">
+        <div className="text-center py-20">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+            You already submitted this survey
+          </h2>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
+            Thank you for your response
+          </p>
+        </div>
+      </DashboardLayout>
     );
   }
 
-  // =========================
-  // UI
-  // =========================
+  // ================= UI =================
   return (
-    <main className="min-h-screen p-8 bg-[var(--bg-secondary)]">
+    <DashboardLayout title={survey.title}>
+      <div className="max-w-2xl">
 
-      {/* HEADER */}
-      <div className="max-w-3xl mx-auto mb-6">
-        <h1 className="text-3xl font-bold text-[var(--text-primary)]">
-          {survey.title}
-        </h1>
+        {/* BACK BUTTON */}
+        <button
+          onClick={() => window.history.back()}
+          className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] mb-6 transition"
+        >
+          <ArrowLeft size={15} /> Back
+        </button>
 
+        {/* DESCRIPTION */}
         {survey.description && (
-          <p className="text-[var(--text-secondary)] mt-2">
+          <p className="text-sm text-[var(--text-secondary)] mb-4">
             {survey.description}
           </p>
         )}
-      </div>
 
-      {/* FORM */}
-      <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-
-        {/* QUESTIONS */}
-        <div className="space-y-4">
-          {questions.map((q, index) => (
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {survey.questions.map((q, index) => (
             <div
               key={q._id}
-              className="p-5 rounded-xl bg-[var(--bg-primary)]
-                         border border-[var(--border)] shadow"
+              className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5"
             >
-              <p className="font-semibold text-[var(--text-primary)] mb-2">
+              <p className="font-semibold text-sm text-[var(--text-primary)] mb-3">
                 {index + 1}. {q.questionText}
               </p>
 
-              {/* ERROR */}
-              {fieldErrors[q._id] && (
-                <p className="text-[var(--status-inactive-text)] text-sm mb-2">
-                  {fieldErrors[q._id]}
+              {errors[q._id] && (
+                <p className="text-red-500 text-xs mb-2">
+                  {errors[q._id]}
                 </p>
               )}
 
-              {/* TEXT INPUT */}
+              {/* INPUT */}
               {["text", "email", "number"].includes(q.questionType) && (
                 <input
-                  className="w-full p-2 rounded border border-[var(--border)]
-                             bg-[var(--bg-secondary)]
-                             text-[var(--text-primary)]"
+                  className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
                   onChange={(e) =>
                     handleChange(q, e.target.value)
@@ -238,13 +206,13 @@ const SurveyPage = () => {
                 />
               )}
 
-              {/* RADIO / CHECKBOX */}
+              {/* OPTIONS */}
               {(q.questionType === "radio" ||
                 q.questionType === "checkbox") &&
                 q.options?.map((opt) => (
                   <label
                     key={opt}
-                    className="flex items-center gap-2 mt-1 text-[var(--text-primary)]"
+                    className="flex items-center gap-2 mt-2 text-sm text-[var(--text-primary)]"
                   >
                     <input
                       type={q.questionType}
@@ -256,12 +224,12 @@ const SurveyPage = () => {
                       onChange={() => {
                         if (q.questionType === "checkbox") {
                           const prev = answers[q._id] || [];
-
-                          const updated = prev.includes(opt)
-                            ? prev.filter((x) => x !== opt)
-                            : [...prev, opt];
-
-                          handleChange(q, updated);
+                          handleChange(
+                            q,
+                            prev.includes(opt)
+                              ? prev.filter((x) => x !== opt)
+                              : [...prev, opt]
+                          );
                         } else {
                           handleChange(q, opt);
                         }
@@ -274,9 +242,7 @@ const SurveyPage = () => {
               {/* DROPDOWN */}
               {q.questionType === "dropdown" && (
                 <select
-                  className="w-full p-2 rounded border border-[var(--border)]
-                             bg-[var(--bg-secondary)]
-                             text-[var(--text-primary)]"
+                  className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
                   onChange={(e) =>
                     handleChange(q, e.target.value)
@@ -292,21 +258,18 @@ const SurveyPage = () => {
               )}
             </div>
           ))}
-        </div>
 
-        {/* SUBMIT */}
-        <button
-          disabled={submitting}
-          className="mt-6 px-6 py-2 rounded
-                     bg-[var(--primary)]
-                     text-[var(--text-on-primary)]
-                     hover:opacity-[var(--btn-hover)]
-                     disabled:opacity-50 transition"
-        >
-          {submitting ? "Submitting..." : "Submit Survey"}
-        </button>
-      </form>
-    </main>
+          {/* SUBMIT */}
+          <button
+            disabled={submitting}
+            className="px-6 py-2.5 rounded-lg text-sm font-medium text-white disabled:opacity-50 transition"
+            style={{ background: "var(--primary)" }}
+          >
+            {submitting ? "Submitting…" : "Submit Survey"}
+          </button>
+        </form>
+      </div>
+    </DashboardLayout>
   );
 };
 

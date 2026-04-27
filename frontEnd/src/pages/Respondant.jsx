@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import axiosInstance from "../axiosConfig";
 import toast from "react-hot-toast";
+import { ClipboardList, ArrowLeft } from "lucide-react";
+import DashboardLayout from "../Components/DashboardLayout";
 
 const Respondent = () => {
   const [surveys, setSurveys] = useState([]);
@@ -13,102 +15,52 @@ const Respondent = () => {
 
   const messageRef = useRef(null);
 
-  // =========================
-  // ACCESSIBILITY FOCUS
-  // =========================
   useEffect(() => {
-    if (message && messageRef.current) {
-      messageRef.current.focus();
-    }
+    if (message && messageRef.current) messageRef.current.focus();
   }, [message]);
 
-  // =========================
-  // FETCH SURVEYS
-  // =========================
   useEffect(() => {
     const fetchSurveys = async () => {
       try {
         const res = await axiosInstance.get("/respondent/active-surveys");
         setSurveys(res.data || []);
-      } catch (err) {
+      } catch {
         toast.error("Failed to load surveys");
       } finally {
         setLoading(false);
       }
     };
-
     fetchSurveys();
   }, []);
 
-  // =========================
-  // HANDLE INPUT CHANGE
-  // =========================
   const handleChange = (q, value) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [q._id]: value,
-    }));
-
-    // remove error instantly
-    setErrors((prev) => ({
-      ...prev,
-      [q._id]: "",
-    }));
+    setAnswers((prev) => ({ ...prev, [q._id]: value }));
+    setErrors((prev) => ({ ...prev, [q._id]: "" }));
   };
 
-  // =========================
-  // VALIDATION (LIKE CREATE FORM)
-  // =========================
   const validate = () => {
     const err = {};
-
     selectedSurvey.questions.forEach((q) => {
       const val = answers[q._id];
-
-      if (
-        val === undefined ||
-        val === "" ||
-        val === null ||
-        (Array.isArray(val) && val.length === 0)
-      ) {
+      if (val === undefined || val === "" || val === null || (Array.isArray(val) && val.length === 0)) {
         err[q._id] = "This field is required";
         return;
       }
-
-      // email validation
       if (q.questionType === "email") {
-        const emailRegex = /\S+@\S+\.\S+/;
-        if (!emailRegex.test(val)) {
-          err[q._id] = "Invalid email format";
-        }
+        if (!/\S+@\S+\.\S+/.test(val)) err[q._id] = "Invalid email format";
       }
-
-      // number validation
       if (q.questionType === "number") {
-        if (isNaN(val)) {
-          err[q._id] = "Must be a number";
-        }
+        if (isNaN(val)) err[q._id] = "Must be a number";
       }
     });
-
     setErrors(err);
-
-    if (Object.keys(err).length > 0) {
-      toast.error("Please fix errors");
-      return false;
-    }
-
+    if (Object.keys(err).length > 0) { toast.error("Please fix errors"); return false; }
     return true;
   };
 
-  // =========================
-  // SUBMIT
-  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (submitting) return;
-
     if (!validate()) return;
 
     const formatted = selectedSurvey.questions.map((q) => ({
@@ -118,172 +70,108 @@ const Respondent = () => {
 
     try {
       setSubmitting(true);
-
-      const res = await axiosInstance.post(
-        `/respondent/survey/${selectedSurvey._id}/submit`,
-        { answers: formatted }
-      );
-
+      const res = await axiosInstance.post(`/respondent/survey/${selectedSurvey._id}/submit`, { answers: formatted });
       toast.success(res.data?.message || "Submitted successfully!");
-
       setMessage("Response submitted successfully!");
       setSelectedSurvey(null);
       setAnswers({});
       setErrors({});
     } catch (err) {
-      const msg =
-        err.response?.data?.message || "Submission failed";
-
+      const msg = err.response?.data?.message || "Submission failed";
       toast.error(msg);
       setMessage(msg);
-
-      // 🚨 important: handle already submitted
-      if (err.response?.status === 403) {
-        setSelectedSurvey(null);
-      }
+      if (err.response?.status === 403) setSelectedSurvey(null);
     } finally {
       setSubmitting(false);
     }
   };
 
-  // =========================
-  // LOADING
-  // =========================
-  if (loading) {
-    return (
-      <div className="p-8 text-[var(--text-secondary)]">
-        Loading surveys...
-      </div>
-    );
-  }
-
-  // =========================
-  // LIST VIEW
-  // =========================
+  /* ── Survey list view ─────────────────────────────────────── */
   if (!selectedSurvey) {
     return (
-      <main className="min-h-screen p-8 bg-[var(--bg-secondary)]">
-
-        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-6">
-          Active Surveys
-        </h1>
-
-        {message && (
-          <div
-            ref={messageRef}
-            tabIndex="-1"
-            className="mb-4 p-3 rounded border border-[var(--border)]
-                       bg-[var(--bg-primary)] text-[var(--text-primary)]"
-          >
-            {message}
-          </div>
-        )}
-
-        <div className="grid gap-4">
-          {surveys.map((survey) => (
-            <div
-              key={survey._id}
-              className="p-5 rounded-xl bg-[var(--bg-primary)]
-                         border border-[var(--border)] shadow"
-            >
-              <h2 className="text-xl font-bold text-[var(--text-primary)]">
-                {survey.title}
-              </h2>
-
-              <p className="text-[var(--text-secondary)] mt-1">
-                {survey.description}
-              </p>
-
-              <button
-                onClick={() => {
-                  setSelectedSurvey(survey);
-                  setMessage("");
-                }}
-                className="mt-3 px-4 py-2 rounded
-                           bg-[var(--primary)]
-                           text-[var(--text-on-primary)]
-                           hover:opacity-[var(--btn-hover)] transition"
+      <DashboardLayout title="Available Surveys">
+        {loading ? (
+          <p className="text-[var(--text-secondary)] text-sm">Loading surveys…</p>
+        ) : (
+          <>
+            {message && (
+              <div
+                ref={messageRef}
+                tabIndex="-1"
+                className="mb-5 px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-sm"
               >
-                Start Survey
-              </button>
-            </div>
-          ))}
-        </div>
-      </main>
+                {message}
+              </div>
+            )}
+
+            {surveys.length === 0 ? (
+              <div className="text-center py-20 text-[var(--text-secondary)]">
+                <ClipboardList size={36} className="mx-auto mb-3 opacity-30" />
+                <p>No active surveys available right now.</p>
+              </div>
+            ) : (
+              <div className="grid gap-4 max-w-2xl">
+                {surveys.map((survey) => (
+                  <div
+                    key={survey._id}
+                    className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5 hover:shadow-md transition"
+                  >
+                    <h2 className="text-base font-semibold text-[var(--text-primary)]">{survey.title}</h2>
+                    <p className="text-sm text-[var(--text-secondary)] mt-1">{survey.description}</p>
+                    <button
+                      onClick={() => { setSelectedSurvey(survey); setMessage(""); }}
+                      className="mt-4 px-4 py-2 rounded-lg text-sm font-medium text-white transition"
+                      style={{ background: "var(--primary)" }}
+                    >
+                      Start Survey
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </DashboardLayout>
     );
   }
 
-  // =========================
-  // FORM VIEW (PRO UI)
-  // =========================
+  /* ── Form view ──────────────────────────────────────────────── */
   return (
-    <main className="min-h-screen p-8 bg-[var(--bg-secondary)]">
+    <DashboardLayout title={selectedSurvey.title}>
+      <div className="max-w-2xl">
 
-      {/* BACK */}
-      <button
-        onClick={() => {
-          setSelectedSurvey(null);
-          setAnswers({});
-          setErrors({});
-        }}
-        className="mb-6 px-4 py-2 rounded-lg
-                   bg-[var(--bg-primary)]
-                   border border-[var(--border)]
-                   text-[var(--text-primary)]
-                   hover:opacity-[var(--btn-hover)]"
-      >
-        ← Back
-      </button>
+        <button
+          onClick={() => { setSelectedSurvey(null); setAnswers({}); setErrors({}); }}
+          className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] mb-6 transition"
+        >
+          <ArrowLeft size={15} /> Back to surveys
+        </button>
 
-      {/* FORM */}
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-3xl mx-auto"
-      >
-        <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-6">
-          {selectedSurvey.title}
-        </h1>
-
-        {/* QUESTIONS AS CARDS */}
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {selectedSurvey.questions.map((q, index) => (
             <div
               key={q._id}
-              className="p-5 rounded-xl bg-[var(--bg-primary)]
-                         border border-[var(--border)] shadow"
+              className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5"
             >
-              <p className="font-semibold text-[var(--text-primary)] mb-2">
+              <p className="font-semibold text-sm text-[var(--text-primary)] mb-3">
                 {index + 1}. {q.questionText}
               </p>
 
-              {/* ERROR */}
               {errors[q._id] && (
-                <p className="text-[var(--status-inactive-text)] text-sm mb-2">
-                  {errors[q._id]}
-                </p>
+                <p className="text-red-500 text-xs mb-2">{errors[q._id]}</p>
               )}
 
-              {/* TEXT */}
               {["text", "email", "number"].includes(q.questionType) && (
                 <input
-                  className="w-full p-2 rounded border border-[var(--border)]
-                             bg-[var(--bg-secondary)]
-                             text-[var(--text-primary)]"
+                  className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
-                  onChange={(e) =>
-                    handleChange(q, e.target.value)
-                  }
+                  onChange={(e) => handleChange(q, e.target.value)}
                 />
               )}
 
-              {/* RADIO / CHECKBOX */}
-              {(q.questionType === "radio" ||
-                q.questionType === "checkbox") &&
+              {(q.questionType === "radio" || q.questionType === "checkbox") &&
                 q.options?.map((opt) => (
-                  <label
-                    key={opt}
-                    className="flex items-center gap-2 mt-1 text-[var(--text-primary)]"
-                  >
+                  <label key={opt} className="flex items-center gap-2 mt-2 text-sm text-[var(--text-primary)]">
                     <input
                       type={q.questionType}
                       checked={
@@ -294,12 +182,7 @@ const Respondent = () => {
                       onChange={() => {
                         if (q.questionType === "checkbox") {
                           const prev = answers[q._id] || [];
-
-                          const updated = prev.includes(opt)
-                            ? prev.filter((x) => x !== opt)
-                            : [...prev, opt];
-
-                          handleChange(q, updated);
+                          handleChange(q, prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt]);
                         } else {
                           handleChange(q, opt);
                         }
@@ -309,42 +192,29 @@ const Respondent = () => {
                   </label>
                 ))}
 
-              {/* DROPDOWN */}
               {q.questionType === "dropdown" && (
                 <select
-                  className="w-full p-2 rounded border border-[var(--border)]
-                             bg-[var(--bg-secondary)]
-                             text-[var(--text-primary)]"
+                  className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
-                  onChange={(e) =>
-                    handleChange(q, e.target.value)
-                  }
+                  onChange={(e) => handleChange(q, e.target.value)}
                 >
                   <option value="">Select</option>
-                  {q.options?.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
+                  {q.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
                 </select>
               )}
             </div>
           ))}
-        </div>
 
-        {/* SUBMIT */}
-        <button
-          disabled={submitting}
-          className="mt-6 px-6 py-2 rounded
-                     bg-[var(--primary)]
-                     text-[var(--text-on-primary)]
-                     hover:opacity-[var(--btn-hover)]
-                     disabled:opacity-50 transition"
-        >
-          {submitting ? "Submitting..." : "Submit Survey"}
-        </button>
-      </form>
-    </main>
+          <button
+            disabled={submitting}
+            className="px-6 py-2.5 rounded-lg text-sm font-medium text-white disabled:opacity-50 transition"
+            style={{ background: "var(--primary)" }}
+          >
+            {submitting ? "Submitting…" : "Submit Survey"}
+          </button>
+        </form>
+      </div>
+    </DashboardLayout>
   );
 };
 

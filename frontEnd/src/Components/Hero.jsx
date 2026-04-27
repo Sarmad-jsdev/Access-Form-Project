@@ -56,7 +56,7 @@ const HeroSection = () => {
 
   <img
     src={assets.img1}
-    className="relative w-full max-w-[500px] rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)] "
+    className="relative w-full max-w-[400px] rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)] "
   />
 </div>
         </div>

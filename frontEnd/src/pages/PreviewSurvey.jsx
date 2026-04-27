@@ -1,17 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
 import axiosInstance from "../axiosConfig";
 import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import DashboardLayout from "../Components/DashboardLayout";
 
 const PreviewSurvey = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [survey, setSurvey] = useState(null);
   const headingRef = useRef(null);
 
-  // =========================
-  // FETCH SURVEY
-  // =========================
   useEffect(() => {
     const fetchSurvey = async () => {
       try {
@@ -21,177 +19,95 @@ const PreviewSurvey = () => {
         console.error("Error fetching survey:", error);
       }
     };
-
     fetchSurvey();
   }, [id]);
 
-  // =========================
-  // FOCUS TITLE (A11Y)
-  // =========================
   useEffect(() => {
-    if (survey && headingRef.current) {
-      headingRef.current.focus();
-    }
+    if (survey && headingRef.current) headingRef.current.focus();
   }, [survey]);
 
-  // =========================
-  // LOADING STATE
-  // =========================
   if (!survey) {
     return (
-      <div
-        className="min-h-screen p-8 bg-[var(--bg-secondary)]"
-        role="status"
-        aria-live="polite"
-      >
-        <p className="text-[var(--text-primary)]">
-          Loading survey...
+      <DashboardLayout title="Preview Survey">
+        <p className="text-[var(--text-secondary)] text-sm" role="status" aria-live="polite">
+          Loading survey…
         </p>
-      </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <main className="min-h-screen p-8 bg-[var(--bg-secondary)] font-[var(--font-dyslexia)]">
+    <DashboardLayout title="Preview Survey">
+      <div className="max-w-2xl space-y-5">
 
-      {/* =========================
-          BACK BUTTON
-      ========================= */}
-      <button
-        onClick={() => navigate("/creator-dashboard")}
-        className="
-          mb-6 px-4 py-2 rounded-lg
-          bg-[var(--bg-primary)]
-          text-[var(--text-primary)]
-          border border-[var(--border)]
-          hover:opacity-90
-          focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]
-        "
-      >
-        ← Back to Dashboard
-      </button>
-
-      {/* =========================
-          MAIN CARD
-      ========================= */}
-      <section
-        className="
-          bg-[var(--bg-primary)]
-          p-8 rounded-xl shadow
-          max-w-3xl mx-auto
-          border border-[var(--border)]
-        "
-        aria-labelledby="preview-heading"
-      >
-
-        {/* TITLE */}
-        <h1
-          id="preview-heading"
-          ref={headingRef}
-          tabIndex="-1"
-          className="
-            text-3xl font-bold mb-2
-            text-[var(--text-primary)]
-            outline-none
-          "
+        <button
+          onClick={() => navigate("/CreatorDashboard")}
+          className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
         >
-          {survey.title}
-        </h1>
+          <ArrowLeft size={15} /> Back to Dashboard
+        </button>
 
-        {/* DESCRIPTION */}
-        <p className="text-[var(--text-secondary)] mb-6">
-          {survey.description}
-        </p>
+        {/* Survey header card */}
+        <div className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-6">
+          <h1
+            ref={headingRef}
+            tabIndex="-1"
+            id="preview-heading"
+            className="text-xl font-bold text-[var(--text-primary)] outline-none"
+          >
+            {survey.title}
+          </h1>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">{survey.description}</p>
+        </div>
 
-        {/* =========================
-            QUESTIONS
-        ========================= */}
+        {/* Questions (read-only) */}
         {survey.questions?.length > 0 ? (
           survey.questions.map((q, i) => (
-            <div key={i} className="mb-8">
+            <div key={i} className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5">
 
-              {/* RADIO / CHECKBOX */}
-              {(q.questionType === "radio" ||
-                q.questionType === "checkbox") && (
-                <fieldset
-                  className="
-                    border border-[var(--border)]
-                    p-4 rounded-lg
-                  "
-                >
-                  <legend className="font-semibold text-[var(--text-primary)] mb-3">
-                    {q.questionText}
+              {(q.questionType === "radio" || q.questionType === "checkbox") ? (
+                <fieldset className="border-none p-0 m-0">
+                  <legend className="font-semibold text-sm text-[var(--text-primary)] mb-3">
+                    {i + 1}. {q.questionText}
                   </legend>
-
                   {q.options?.map((opt, index) => (
-                    <label
-                      key={index}
-                      className="flex items-center gap-2 mb-2 text-[var(--text-primary)]"
-                    >
-                      <input
-                        type={q.questionType}
-                        disabled
-                        className="accent-[var(--primary)]"
-                      />
+                    <label key={index} className="flex items-center gap-2 mb-2 text-sm text-[var(--text-primary)]">
+                      <input type={q.questionType} disabled className="accent-[var(--primary)]" />
                       {opt}
                     </label>
                   ))}
                 </fieldset>
-              )}
-
-              {/* DROPDOWN */}
-              {q.questionType === "dropdown" && (
+              ) : q.questionType === "dropdown" ? (
                 <div>
-                  <label className="block font-semibold mb-2 text-[var(--text-primary)]">
-                    {q.questionText}
+                  <label className="block font-semibold text-sm text-[var(--text-primary)] mb-2">
+                    {i + 1}. {q.questionText}
                   </label>
-
                   <select
                     disabled
-                    className="
-                      w-full p-2 rounded-lg
-                      bg-[var(--bg-secondary)]
-                      text-[var(--text-primary)]
-                      border border-[var(--border)]
-                    "
+                    className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
                   >
-                    {q.options?.map((opt, i) => (
-                      <option key={i}>{opt}</option>
-                    ))}
+                    {q.options?.map((opt, j) => <option key={j}>{opt}</option>)}
                   </select>
                 </div>
+              ) : (
+                <div>
+                  <label className="block font-semibold text-sm text-[var(--text-primary)] mb-2">
+                    {i + 1}. {q.questionText}
+                  </label>
+                  <input
+                    type={q.questionType}
+                    disabled
+                    className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
+                  />
+                </div>
               )}
-
-              {/* TEXT / NUMBER / EMAIL */}
-              {q.questionType !== "radio" &&
-                q.questionType !== "checkbox" &&
-                q.questionType !== "dropdown" && (
-                  <div>
-                    <label className="block font-semibold mb-2 text-[var(--text-primary)]">
-                      {q.questionText}
-                    </label>
-
-                    <input
-                      type={q.questionType}
-                      disabled
-                      className="
-                        w-full p-2 rounded-lg
-                        bg-[var(--bg-secondary)]
-                        text-[var(--text-primary)]
-                        border border-[var(--border)]
-                      "
-                    />
-                  </div>
-                )}
             </div>
           ))
         ) : (
-          <p className="text-[var(--text-secondary)]">
-            No questions found in this survey.
-          </p>
+          <p className="text-sm text-[var(--text-secondary)]">No questions found.</p>
         )}
-      </section>
-    </main>
+      </div>
+    </DashboardLayout>
   );
 };
 

@@ -71,7 +71,7 @@ const Login = () => {
         }
 
         if (user.role === "admin") navigate("/AdminDashboard");
-        else if (user.role === "creator") navigate("/creator-dashboard");
+        else if (user.role === "creator") navigate("/CreatorDashboard");
         else navigate("/Respondent");
       }, 1200);
     } catch (err) {
