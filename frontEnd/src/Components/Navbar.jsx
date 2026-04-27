@@ -51,7 +51,7 @@ const Navbar = () => {
             <div className="flex items-center gap-2 ml-4">
               <Link
                 to="/login"
-                className="px-4 py-2 text-sm rounded-lg bg-[var(--primary)] text-white"
+                className="px-4 py-2 text-sm rounded-lg bg-[var(--primary)] text-[var(--text-on-primary)]"
               >
                 Login
               </Link>
@@ -89,8 +89,8 @@ const Navbar = () => {
                   block px-3 py-2 rounded-lg text-sm
                   ${
                     isActive
-                      ? "bg-[var(--primary)] text-white"
-                      : "text-[var(--text-on primary)]"
+                      ? "bg-[var(--primary)] text-[var(--text-on-primary)] shadow-sm"
+                      : "text-[var(--text-secondary)]"
                   }
                 `}
               >
