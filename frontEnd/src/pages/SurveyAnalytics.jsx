@@ -94,7 +94,7 @@ const SurveyAnalytics = () => {
         {/* Back */}
         <button
           onClick={() => navigate("/CreatorDashboard")}
-          className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+          className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
         >
           <ArrowLeft size={15} /> Back to Dashboard
         </button>
@@ -114,14 +114,14 @@ const SurveyAnalytics = () => {
             <div className="flex gap-2">
               <button
                 onClick={exportCSV}
-                className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium text-white transition"
+                className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium text-[var(--text-on-primary)] cursor-pointer transition"
                 style={{ background: "var(--primary)" }}
               >
                 <Download size={14} /> CSV
               </button>
               <button
                 onClick={exportPDF}
-                className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium text-white transition"
+                className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium text-[var(--text-on-primary)] cursor-pointer transition"
                 style={{ background: "var(--accent, #8b5cf6)" }}
               >
                 <Download size={14} /> PDF
@@ -139,7 +139,7 @@ const SurveyAnalytics = () => {
             >
               <div className="flex items-center gap-3 mb-4">
                 <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-on-primary)] text-xs font-bold flex-shrink-0"
                   style={{ background: "var(--primary)" }}
                 >
                   {i + 1}

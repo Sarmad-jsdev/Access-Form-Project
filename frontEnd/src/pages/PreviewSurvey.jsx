@@ -38,14 +38,21 @@ const PreviewSurvey = () => {
 
   return (
     <DashboardLayout title="Preview Survey">
+
+      {/* Back button */}
+      <div className="flex justify-end mb-4">
+          <button
+            onClick={() => navigate("/CreatorDashboard")}
+            className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
+          >
+             <ArrowLeft size={15} /> Back to Dashboard
+          </button>
+        </div>
+
+        {/* Main content */}
+
       <div className="max-w-2xl space-y-5">
 
-        <button
-          onClick={() => navigate("/CreatorDashboard")}
-          className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-        >
-          <ArrowLeft size={15} /> Back to Dashboard
-        </button>
 
         {/* Survey header card */}
         <div className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-6">

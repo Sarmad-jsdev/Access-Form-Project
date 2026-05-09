@@ -52,7 +52,7 @@ const ConfirmModal = ({
 
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 rounded-lg text-sm text[var(--text-on-primary)] cursor-pointer  transition ${styles[type]}`}
+            className={`px-4 py-2 rounded-lg text-sm text-[var(--text-on-primary)] cursor-pointer  transition ${styles[type]}`}
           >
             {confirmText}
           </button>

@@ -122,7 +122,7 @@ const SidebarContent = ({ user, navItems, location, onLogout, onClose }) => (
       <button
         onClick={onLogout}
         className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium
-          text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-red-500 transition-all"
+          text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-red-500 transition-all cursor-pointer"
       >
         <LogOut size={16} />
         Log Out

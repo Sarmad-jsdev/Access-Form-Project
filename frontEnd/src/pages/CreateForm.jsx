@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import axiosInstance from "../axiosConfig";
 import { Trash2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import DashboardLayout from "../Components/DashboardLayout";
+import { ArrowLeft } from "lucide-react";
 
 const CreateForm = () => {
   const navigate = useNavigate();
@@ -22,17 +23,24 @@ const CreateForm = () => {
     if (questions.length === 0) err.questions = "At least 1 question required";
     questions.forEach((q, i) => {
       if (!q.questionText?.trim()) err[`q_${i}`] = "Question text is required";
-      if (["radio", "checkbox", "dropdown"].includes(q.questionType) && (!q.options || q.options.length < 2))
+      if (
+        ["radio", "dropdown"].includes(q.questionType) &&
+        (!q.options || q.options.length < 2)
+      )
         err[`q_opt_${i}`] = "At least 2 options required";
       q.options?.forEach((opt, oi) => {
-        if (!opt.trim()) err[`q_opt_empty_${i}_${oi}`] = "Option cannot be empty";
+        if (!opt.trim())
+          err[`q_opt_empty_${i}_${oi}`] = "Option cannot be empty";
       });
     });
     return err;
   };
 
   const addQuestion = () =>
-    setQuestions((prev) => [...prev, { questionText: "", questionType: "text", options: [] }]);
+    setQuestions((prev) => [
+      ...prev,
+      { questionText: "", questionType: "text", options: [] },
+    ]);
 
   const deleteQuestion = (index) =>
     setQuestions((prev) => prev.filter((_, i) => i !== index));
@@ -41,7 +49,10 @@ const CreateForm = () => {
     setQuestions((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], [field]: value };
-      if (field === "questionType" && (value === "text" || value === "number"))
+      if (
+        field === "questionType" &&
+        ["text", "number", "textarea", "email", "rating"].includes(value)
+      )
         updated[index].options = [];
       return updated;
     });
@@ -50,7 +61,10 @@ const CreateForm = () => {
   const addOption = (qIndex) =>
     setQuestions((prev) => {
       const updated = [...prev];
-      updated[qIndex] = { ...updated[qIndex], options: [...(updated[qIndex].options || []), ""] };
+      updated[qIndex] = {
+        ...updated[qIndex],
+        options: [...(updated[qIndex].options || []), ""],
+      };
       return updated;
     });
 
@@ -66,7 +80,10 @@ const CreateForm = () => {
   const handleSubmit = async () => {
     const validationErrors = validate();
     setErrors(validationErrors);
-    if (Object.keys(validationErrors).length > 0) { toast.error("Please fix form errors"); return; }
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error("Please fix form errors");
+      return;
+    }
     try {
       setLoading(true);
       const cleanedQuestions = questions.map((q) => ({
@@ -74,7 +91,11 @@ const CreateForm = () => {
         questionType: q.questionType,
         options: q.options || [],
       }));
-      const res = await axiosInstance.post("/creator/create-survey", { title, description, questions: cleanedQuestions });
+      const res = await axiosInstance.post("/creator/create-survey", {
+        title,
+        description,
+        questions: cleanedQuestions,
+      });
       if (res.status === 200 || res.status === 201) {
         setShowOverlay(true);
         toast.success("Survey created 🎉");
@@ -89,18 +110,30 @@ const CreateForm = () => {
 
   return (
     <DashboardLayout title="Create New Survey">
+      <div className="flex justify-end mb-4">
+        <button
+          onClick={() => navigate("/CreatorDashboard")}
+          className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
+        >
+          <ArrowLeft size={15} /> Back to Dashboard
+        </button>
+      </div>
 
       {showOverlay && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-[var(--bg-primary)] p-6 rounded-2xl shadow border border-[var(--border)] text-center">
-            <h2 className="font-bold text-lg mb-1" style={{ color: "var(--primary)" }}>Survey Created 🎉</h2>
+            <h2
+              className="font-bold text-lg mb-1"
+              style={{ color: "var(--primary)" }}
+            >
+              Survey Created 🎉
+            </h2>
             <p className="text-sm text-[var(--text-secondary)]">Redirecting…</p>
           </div>
         </div>
       )}
 
       <div className="max-w-2xl space-y-5">
-
         {/* Title + description */}
         <div className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5 space-y-3">
           <div>
@@ -110,7 +143,9 @@ const CreateForm = () => {
               placeholder="Survey title"
               className="w-full p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
             />
-            {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
+            {errors.title && (
+              <p className="text-red-500 text-xs mt-1">{errors.title}</p>
+            )}
           </div>
           <div>
             <textarea
@@ -120,80 +155,116 @@ const CreateForm = () => {
               rows={3}
               className="w-full p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
             />
-            {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-xs mt-1">{errors.description}</p>
+            )}
           </div>
         </div>
 
         {/* Questions */}
         {questions.map((q, index) => (
-          <div key={index} className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5 space-y-3">
+          <div
+            key={index}
+            className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5 space-y-3"
+          >
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">
                 Question {index + 1}
               </span>
-              <button onClick={() => deleteQuestion(index)} className="text-red-500 hover:text-red-600 transition">
+              <button
+                onClick={() => deleteQuestion(index)}
+                className="text-[var(--btn-warning)] cursor-pointer"
+              >
                 <Trash2 size={15} />
               </button>
             </div>
 
             <input
               value={q.questionText}
-              onChange={(e) => handleQuestionChange(index, "questionText", e.target.value)}
+              onChange={(e) =>
+                handleQuestionChange(index, "questionText", e.target.value)
+              }
               placeholder="Question text"
               className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
             />
-            {errors[`q_${index}`] && <p className="text-red-500 text-xs">{errors[`q_${index}`]}</p>}
+            {errors[`q_${index}`] && (
+              <p className="text-red-500 text-xs">{errors[`q_${index}`]}</p>
+            )}
 
             <select
               value={q.questionType}
-              onChange={(e) => handleQuestionChange(index, "questionType", e.target.value)}
-              className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
+              onChange={(e) =>
+                handleQuestionChange(index, "questionType", e.target.value)
+              }
+              className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm cursor-pointer"
             >
               <option value="text">Text</option>
+              <option value="textarea">Textarea</option>
+              <option value="email">Email</option>
               <option value="number">Number</option>
               <option value="radio">Radio</option>
-              <option value="checkbox">Checkbox</option>
               <option value="dropdown">Dropdown</option>
+              <option value="rating">Rating</option>
             </select>
 
-            {q.questionType !== "text" && q.questionType !== "number" && (
-              <div className="space-y-1.5">
-                {(q.options || []).map((opt, i) => (
-                  <input
-                    key={i}
-                    value={opt}
-                    onChange={(e) => handleOptionChange(index, i, e.target.value)}
-                    className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
-                    placeholder={`Option ${i + 1}`}
-                  />
-                ))}
-                {errors[`q_opt_${index}`] && <p className="text-red-500 text-xs">{errors[`q_opt_${index}`]}</p>}
-                <button
-                  onClick={() => addOption(index)}
-                  className="text-xs font-medium mt-1"
-                  style={{ color: "var(--primary)" }}
-                >
-                  + Add option
-                </button>
+            {q.questionType === "rating" && (
+              <div className="text-xs text-[var(--text-secondary)]">
+                (Will be a 1-5 rating)
               </div>
             )}
+
+            {["radio", "dropdown"].includes(q.questionType) && (
+                <div className="space-y-1.5">
+                  {(q.options || []).map((opt, i) => (
+                    <input
+                      key={i}
+                      value={opt}
+                      onChange={(e) =>
+                        handleOptionChange(index, i, e.target.value)
+                      }
+                      className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
+                      placeholder={`Option ${i + 1}`}
+                    />
+                  ))}
+                  {errors[`q_opt_${index}`] && (
+                    <p className="text-red-500 text-xs">
+                      {errors[`q_opt_${index}`]}
+                    </p>
+                  )}
+                  <button
+                    onClick={() => addOption(index)}
+                    className="text-xs font-medium mt-1"
+                    style={{
+                      color: "var(--primary)",
+                      background: "var(--bg-secondary)",
+                      padding: "4px 8px",
+                      borderRadius: "999px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    + Add option
+                  </button>
+                </div>
+              )}
           </div>
         ))}
 
-        {errors.questions && <p className="text-red-500 text-xs">{errors.questions}</p>}
+        {errors.questions && (
+          <p className="text-red-500 text-xs">{errors.questions}</p>
+        )}
 
         {/* Actions */}
         <div className="flex gap-3">
           <button
             onClick={addQuestion}
-            className="px-4 py-2.5 rounded-xl text-sm font-medium border border-[var(--border)] text-[var(--text-primary)] bg-[var(--bg-primary)] hover:bg-[var(--bg-secondary)] transition"
+            className="px-4 py-2.5 rounded-xl text-sm font-medium border border-[var(--border)] text-[var(--text-primary)] bg-[var(--bg-primary)] hover:bg-[var(--bg-secondary)] transition cursor-pointer"
           >
             + Add Question
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="px-5 py-2.5 rounded-xl text-sm font-medium text-white disabled:opacity-50 transition"
+            className="px-5 py-2.5 rounded-xl text-sm font-medium text-[var(--text-on-primary)] cursor-pointer disabled:opacity-50 transition"
             style={{ background: "var(--primary)" }}
           >
             {loading ? "Saving…" : "Save Survey"}

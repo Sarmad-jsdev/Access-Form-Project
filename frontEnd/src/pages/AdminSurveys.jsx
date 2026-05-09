@@ -21,7 +21,7 @@ const AdminSurveys = () => {
         <div className="flex justify-end mb-4">
           <button
             onClick={() => navigate("/AdminDashboard")}
-            className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] text-sm"
+            className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
           >
              <ArrowLeft size={15} /> Back to Dashboard
           </button>
@@ -51,7 +51,7 @@ const AdminSurveys = () => {
 
             <button
               onClick={() => navigate(`/admin/surveys/preview/${s._id}`)}
-              className="px-4 py-2 rounded-lg bg-[var(--primary)] text-white text-sm"
+              className="px-4 py-2 rounded-lg bg-[var(--primary)] text-[var(--text-on-primary)] cursor-pointer text-sm"
             >
               Preview
             </button>

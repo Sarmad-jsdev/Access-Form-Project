@@ -94,17 +94,18 @@ const SurveyPage = () => {
     if (!validate()) return;
 
     const formatted = survey.questions.map((q) => ({
+      questionId: q._id,
       questionText: q.questionText,
+      questionType: q.questionType,
       answer: answers[q._id],
     }));
 
     try {
       setSubmitting(true);
 
-      const res = await axiosInstance.post(
-        `/respondent/survey/${id}/submit`,
-        { answers: formatted }
-      );
+      const res = await axiosInstance.post(`/respondent/survey/${id}/submit`, {
+        answers: formatted,
+      });
 
       toast.success(res.data?.message || "Submitted successfully!");
       setSubmitted(true);
@@ -136,9 +137,7 @@ const SurveyPage = () => {
   if (!survey && !submitted) {
     return (
       <DashboardLayout title="">
-        <p className="text-[var(--text-secondary)] text-sm">
-          Survey not found
-        </p>
+        <p className="text-[var(--text-secondary)] text-sm">Survey not found</p>
       </DashboardLayout>
     );
   }
@@ -162,15 +161,6 @@ const SurveyPage = () => {
   return (
     <DashboardLayout title={survey.title}>
       <div className="max-w-2xl">
-
-        {/* BACK BUTTON */}
-        <button
-          onClick={() => window.history.back()}
-          className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] mb-6 transition"
-        >
-          <ArrowLeft size={15} /> Back
-        </button>
-
         {/* DESCRIPTION */}
         {survey.description && (
           <p className="text-sm text-[var(--text-secondary)] mb-4">
@@ -190,50 +180,61 @@ const SurveyPage = () => {
               </p>
 
               {errors[q._id] && (
-                <p className="text-red-500 text-xs mb-2">
-                  {errors[q._id]}
-                </p>
+                <p className="text-red-500 text-xs mb-2">{errors[q._id]}</p>
               )}
 
-              {/* INPUT */}
+              {/* TEXT / EMAIL / NUMBER */}
               {["text", "email", "number"].includes(q.questionType) && (
                 <input
+                  type={q.questionType}
                   className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
-                  onChange={(e) =>
-                    handleChange(q, e.target.value)
-                  }
+                  onChange={(e) => handleChange(q, e.target.value)}
                 />
               )}
 
-              {/* OPTIONS */}
-              {(q.questionType === "radio" ||
-                q.questionType === "checkbox") &&
+              {/* TEXTAREA */}
+              {q.questionType === "textarea" && (
+                <textarea
+                  rows={4}
+                  className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
+                  value={answers[q._id] || ""}
+                  onChange={(e) => handleChange(q, e.target.value)}
+                />
+              )}
+
+              {/* RATING */}
+              {q.questionType === "rating" && (
+                <div className="flex gap-2 mt-2">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      type="button"
+                      key={num}
+                      onClick={() => handleChange(q, num)}
+                      className={`w-10 h-10 rounded-lg border text-sm cursor-pointer transition ${
+                        answers[q._id] === num
+                          ? "bg-[var(--primary)] text-[var(--text-on-primary)]"
+                          : "bg-[var(--bg-secondary)] text-[var(--text-primary)]"
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* RADIO */}
+              {q.questionType === "radio" &&
                 q.options?.map((opt) => (
                   <label
                     key={opt}
                     className="flex items-center gap-2 mt-2 text-sm text-[var(--text-primary)]"
                   >
                     <input
-                      type={q.questionType}
-                      checked={
-                        q.questionType === "checkbox"
-                          ? (answers[q._id] || []).includes(opt)
-                          : answers[q._id] === opt
-                      }
-                      onChange={() => {
-                        if (q.questionType === "checkbox") {
-                          const prev = answers[q._id] || [];
-                          handleChange(
-                            q,
-                            prev.includes(opt)
-                              ? prev.filter((x) => x !== opt)
-                              : [...prev, opt]
-                          );
-                        } else {
-                          handleChange(q, opt);
-                        }
-                      }}
+                      type="radio"
+                      name={q._id}
+                      checked={answers[q._id] === opt}
+                      onChange={() => handleChange(q, opt)}
                     />
                     {opt}
                   </label>
@@ -244,9 +245,7 @@ const SurveyPage = () => {
                 <select
                   className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
-                  onChange={(e) =>
-                    handleChange(q, e.target.value)
-                  }
+                  onChange={(e) => handleChange(q, e.target.value)}
                 >
                   <option value="">Select</option>
                   {q.options?.map((opt) => (
@@ -262,7 +261,7 @@ const SurveyPage = () => {
           {/* SUBMIT */}
           <button
             disabled={submitting}
-            className="px-6 py-2.5 rounded-lg text-sm font-medium text-white disabled:opacity-50 transition"
+            className="px-6 py-2.5 rounded-lg text-sm font-medium text-[var(--text-on-primary)] cursor-pointer disabled:opacity-50 transition"
             style={{ background: "var(--primary)" }}
           >
             {submitting ? "Submitting…" : "Submit Survey"}

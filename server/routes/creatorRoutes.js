@@ -11,10 +11,10 @@ router.get("/my-surveys", authMiddleware, async (req, res) => {
     const surveys = await Survey.find({ creator: req.user.id });
 
     const totalSurveys = surveys.length;
-    const activeSurveys = surveys.filter(s => s.isActive).length;
+    const activeSurveys = surveys.filter((s) => s.isActive).length;
 
     const totalResponses = await Response.countDocuments({
-      survey: { $in: surveys.map(s => s._id) }
+      survey: { $in: surveys.map((s) => s._id) },
     });
 
     res.json({
@@ -22,18 +22,16 @@ router.get("/my-surveys", authMiddleware, async (req, res) => {
       stats: {
         totalSurveys,
         activeSurveys,
-        totalResponses
-      }
+        totalResponses,
+      },
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
-})
+});
 
-
-// ✅ Create new survey
+// Create new survey
 router.post("/create-survey", authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== "creator") {
@@ -41,6 +39,29 @@ router.post("/create-survey", authMiddleware, async (req, res) => {
     }
 
     const { title, description, questions } = req.body;
+    if (!title || !questions || questions.length === 0) {
+      return res.status(400).json({
+        message: "Title and questions are required",
+      });
+    }
+
+    for (const q of questions) {
+      if (!q.questionText || !q.questionType) {
+        return res.status(400).json({
+          message: "Question text and type are required",
+        });
+      }
+
+      // radio/dropdown need options
+      if (
+        ["radio", "dropdown"].includes(q.questionType) &&
+        (!q.options || q.options.length < 2)
+      ) {
+        return res.status(400).json({
+          message: "Options required for radio/dropdown",
+        });
+      }
+    }
 
     const survey = await Survey.create({
       title,
@@ -50,12 +71,11 @@ router.post("/create-survey", authMiddleware, async (req, res) => {
     });
 
     res.status(201).json(survey);
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
-}); 
+});
 
 // DELETE user survey
 router.delete("/delete-survey/:id", authMiddleware, async (req, res) => {
@@ -82,7 +102,6 @@ router.delete("/delete-survey/:id", authMiddleware, async (req, res) => {
   }
 });
 
-
 // ✅ Preview survey (get by ID)
 router.get("/survey/:id", authMiddleware, async (req, res) => {
   try {
@@ -101,7 +120,6 @@ router.get("/survey/:id", authMiddleware, async (req, res) => {
 // ✅ Get survey analytics
 router.get("/analytics/:id", authMiddleware, async (req, res) => {
   try {
-
     if (req.user.role !== "creator") {
       return res.status(403).json({ message: "Access denied" });
     }
@@ -130,7 +148,6 @@ router.get("/analytics/:id", authMiddleware, async (req, res) => {
       })),
     }));
 
-
     res.json({
       surveyTitle: survey.title,
       totalResponses: responses.length,
@@ -141,8 +158,6 @@ router.get("/analytics/:id", authMiddleware, async (req, res) => {
   }
 });
 
-
-// ✅ Toggle survey active/inactive
 router.patch("/toggle-survey/:id", authMiddleware, async (req, res) => {
   try {
     if (req.user.role !== "creator") {
@@ -151,7 +166,7 @@ router.patch("/toggle-survey/:id", authMiddleware, async (req, res) => {
 
     const survey = await Survey.findOne({
       _id: req.params.id,
-      creator: req.user.id,
+      creator: req.user.id || req.user._id,
     });
 
     if (!survey) {
@@ -159,18 +174,21 @@ router.patch("/toggle-survey/:id", authMiddleware, async (req, res) => {
     }
 
     survey.isActive = !survey.isActive;
+
     await survey.save();
 
-    res.json({
-      message: `Survey ${survey.isActive ? "activated" : "deactivated"}`,
+    return res.status(200).json({
+      message: survey.isActive ? "Survey activated" : "Survey deactivated",
       isActive: survey.isActive,
     });
-
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Toggle Survey Error:", error); // 👈 IMPORTANT
+
+    return res.status(500).json({
+      message: "Server error while toggling survey",
+      error: error.message, // 👈 TEMP DEBUG (remove in production)
+    });
   }
 });
-
-
 
 export default router;

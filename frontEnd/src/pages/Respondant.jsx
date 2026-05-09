@@ -42,7 +42,12 @@ const Respondent = () => {
     const err = {};
     selectedSurvey.questions.forEach((q) => {
       const val = answers[q._id];
-      if (val === undefined || val === "" || val === null || (Array.isArray(val) && val.length === 0)) {
+      if (
+        val === undefined ||
+        val === "" ||
+        val === null ||
+        (Array.isArray(val) && val.length === 0)
+      ) {
         err[q._id] = "This field is required";
         return;
       }
@@ -54,7 +59,10 @@ const Respondent = () => {
       }
     });
     setErrors(err);
-    if (Object.keys(err).length > 0) { toast.error("Please fix errors"); return false; }
+    if (Object.keys(err).length > 0) {
+      toast.error("Please fix errors");
+      return false;
+    }
     return true;
   };
 
@@ -64,13 +72,18 @@ const Respondent = () => {
     if (!validate()) return;
 
     const formatted = selectedSurvey.questions.map((q) => ({
+      questionId: q._id,
       questionText: q.questionText,
+      questionType: q.questionType,
       answer: answers[q._id],
     }));
 
     try {
       setSubmitting(true);
-      const res = await axiosInstance.post(`/respondent/survey/${selectedSurvey._id}/submit`, { answers: formatted });
+      const res = await axiosInstance.post(
+        `/respondent/survey/${selectedSurvey._id}/submit`,
+        { answers: formatted },
+      );
       toast.success(res.data?.message || "Submitted successfully!");
       setMessage("Response submitted successfully!");
       setSelectedSurvey(null);
@@ -91,7 +104,9 @@ const Respondent = () => {
     return (
       <DashboardLayout title="Available Surveys">
         {loading ? (
-          <p className="text-[var(--text-secondary)] text-sm">Loading surveys…</p>
+          <p className="text-[var(--text-secondary)] text-sm">
+            Loading surveys…
+          </p>
         ) : (
           <>
             {message && (
@@ -116,11 +131,18 @@ const Respondent = () => {
                     key={survey._id}
                     className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5 hover:shadow-md transition"
                   >
-                    <h2 className="text-base font-semibold text-[var(--text-primary)]">{survey.title}</h2>
-                    <p className="text-sm text-[var(--text-secondary)] mt-1">{survey.description}</p>
+                    <h2 className="text-base font-semibold text-[var(--text-primary)]">
+                      {survey.title}
+                    </h2>
+                    <p className="text-sm text-[var(--text-secondary)] mt-1">
+                      {survey.description}
+                    </p>
                     <button
-                      onClick={() => { setSelectedSurvey(survey); setMessage(""); }}
-                      className="mt-4 px-4 py-2 rounded-lg text-sm font-medium text-white transition"
+                      onClick={() => {
+                        setSelectedSurvey(survey);
+                        setMessage("");
+                      }}
+                      className="mt-4 px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-on-primary)] cursor-pointer transition"
                       style={{ background: "var(--primary)" }}
                     >
                       Start Survey
@@ -139,10 +161,13 @@ const Respondent = () => {
   return (
     <DashboardLayout title={selectedSurvey.title}>
       <div className="max-w-2xl">
-
         <button
-          onClick={() => { setSelectedSurvey(null); setAnswers({}); setErrors({}); }}
-          className="flex items-center gap-1.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] mb-6 transition"
+          onClick={() => {
+            setSelectedSurvey(null);
+            setAnswers({});
+            setErrors({});
+          }}
+          className="px-4 py-2 my-4 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
         >
           <ArrowLeft size={15} /> Back to surveys
         </button>
@@ -161,32 +186,57 @@ const Respondent = () => {
                 <p className="text-red-500 text-xs mb-2">{errors[q._id]}</p>
               )}
 
+              {/* TEXT */}
               {["text", "email", "number"].includes(q.questionType) && (
                 <input
+                  type={q.questionType}
                   className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
                   onChange={(e) => handleChange(q, e.target.value)}
                 />
               )}
 
-              {(q.questionType === "radio" || q.questionType === "checkbox") &&
+              {/* TEXTAREA */}
+              {q.questionType === "textarea" && (
+                <textarea
+                  rows={4}
+                  className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
+                  value={answers[q._id] || ""}
+                  onChange={(e) => handleChange(q, e.target.value)}
+                />
+              )}
+
+              {/* RATING */}
+              {q.questionType === "rating" && (
+                <div className="flex gap-2 mt-2">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      type="button"
+                      key={num}
+                      onClick={() => handleChange(q, num)}
+                      className={`w-10 h-10 rounded-lg border text-sm cursor-pointer transition ${
+                        answers[q._id] === num
+                          ? "bg-[var(--primary)] text-[var(--text-on-primary)]"
+                          : "bg-[var(--bg-secondary)] text-[var(--text-primary)]"
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {q.questionType === "radio" &&
                 q.options?.map((opt) => (
-                  <label key={opt} className="flex items-center gap-2 mt-2 text-sm text-[var(--text-primary)]">
+                  <label
+                    key={opt}
+                    className="flex items-center gap-2 mt-2 text-sm text-[var(--text-primary)] cursor-pointer"
+                  >
                     <input
-                      type={q.questionType}
-                      checked={
-                        q.questionType === "checkbox"
-                          ? (answers[q._id] || []).includes(opt)
-                          : answers[q._id] === opt
-                      }
-                      onChange={() => {
-                        if (q.questionType === "checkbox") {
-                          const prev = answers[q._id] || [];
-                          handleChange(q, prev.includes(opt) ? prev.filter((x) => x !== opt) : [...prev, opt]);
-                        } else {
-                          handleChange(q, opt);
-                        }
-                      }}
+                      type="radio"
+                      name={q._id}
+                      checked={answers[q._id] === opt}
+                      onChange={() => handleChange(q, opt)}
                     />
                     {opt}
                   </label>
@@ -199,7 +249,11 @@ const Respondent = () => {
                   onChange={(e) => handleChange(q, e.target.value)}
                 >
                   <option value="">Select</option>
-                  {q.options?.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                  {q.options?.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
                 </select>
               )}
             </div>
@@ -207,7 +261,7 @@ const Respondent = () => {
 
           <button
             disabled={submitting}
-            className="px-6 py-2.5 rounded-lg text-sm font-medium text-white disabled:opacity-50 transition"
+            className="px-6 py-2.5 rounded-lg text-sm font-medium text-[var(--text-on-primary)] cursor-pointer disabled:opacity-50 transition"
             style={{ background: "var(--primary)" }}
           >
             {submitting ? "Submitting…" : "Submit Survey"}

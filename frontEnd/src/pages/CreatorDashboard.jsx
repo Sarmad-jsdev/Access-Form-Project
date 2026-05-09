@@ -91,7 +91,7 @@ const CreatorDashboard = () => {
         <h2 className="text-base font-semibold text-[var(--text-primary)]">Your Surveys</h2>
         <Link
           to="/CreateForm"
-          className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg text-white transition"
+          className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg text-[var(--text-on-primary)] cursor-pointer transition"
           style={{ background: "var(--primary)" }}
         >
           <PlusCircle size={15} /> New Survey
@@ -142,7 +142,7 @@ const CreatorDashboard = () => {
             {/* Toggle active button */}
             <button
               onClick={() => toggleStatus(survey._id)}
-              className="text-xs text-[var(--text-secondary)] underline underline-offset-2 text-left w-fit"
+              className="text-xs text-[var(--text-secondary)] underline underline-offset-2 text-left w-fit cursor-pointer"
             >
               {survey.isActive ? "Deactivate" : "Activate"}
             </button>
@@ -151,28 +151,28 @@ const CreatorDashboard = () => {
             <div className="flex flex-wrap gap-2 pt-1 border-t border-[var(--border)]">
               <Link
                 to={`/preview/${survey._id}`}
-                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer"
                 style={{ background: "var(--btn-preview, #3b82f6)", color: "#fff" }}
               >
                 <Eye size={12} /> Preview
               </Link>
               <Link
                 to={`/creator/analytics/${survey._id}`}
-                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer"
                 style={{ background: "var(--btn-analytics, #8b5cf6)", color: "#fff" }}
               >
                 <BarChart size={12} /> Analytics
               </Link>
               <button
                 onClick={() => handleCopyLink(survey._id)}
-                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer"
                 style={{ background: "var(--btn-success, #22c55e)", color: "#fff" }}
               >
                 <Copy size={12} /> Copy Link
               </button>
               <button
                 onClick={() => handleDelete(survey._id)}
-                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium"
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer"
                 style={{ background: "var(--btn-warning, #ef4444)", color: "#fff" }}
               >
                 <Trash2 size={12} /> Delete

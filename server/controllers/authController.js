@@ -14,7 +14,7 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials" });
 
     const token = jwt.sign(
-      { id: user._id }, // ✅ remove role (not needed here)
+      { id: user._id }, // PAY ATTENTION TO THIS, IT'S THE USER ID, NOT THE EMAIL
       process.env.JWT_SECRET,
       { expiresIn: "7d" },
     );
