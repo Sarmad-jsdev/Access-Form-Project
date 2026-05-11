@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import FieldError from "../Components/InlineError";
-import { getDashboardRoute } from "../utilis/DashboardRoute";
+import getDashboardRoute  from "../utilis/DashboardRoute.js";
 
 const Login = () => {
   const { login } = useContext(AuthContext);

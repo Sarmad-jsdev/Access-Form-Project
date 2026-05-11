@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import getDashboardRoute from "../utils/DashboardRoute";
+import getDashboardRoute from "../utilis/DashboardRoute";
 
 const PublicRoute = ({ children }) => {
 
