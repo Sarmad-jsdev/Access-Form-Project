@@ -61,12 +61,17 @@ const AdminUsers = () => {
 
         setUsers((prev) =>
           prev.map((u) =>
-            u._id === user._id ? { ...u, isBlocked: !u.isBlocked } : u
-          )
+            u._id === user._id
+              ? {
+                  ...u,
+                  status: u.status === "active" ? "blocked" : "active",
+                }
+              : u,
+          ),
         );
 
         toast.success(
-          user.isBlocked ? "User unblocked" : "User blocked"
+          user.status === "blocked" ? "User unblocked" : "User blocked",
         );
       }
 
@@ -93,19 +98,13 @@ const AdminUsers = () => {
 
   return (
     <DashboardLayout title="Users">
-
       {/* LOADING */}
       {loading ? (
-        <p className="text-sm text-[var(--text-secondary)]">
-          Loading users...
-        </p>
+        <p className="text-sm text-[var(--text-secondary)]">Loading users...</p>
       ) : users.length === 0 ? (
-        <p className="text-sm text-[var(--text-secondary)]">
-          No users found
-        </p>
+        <p className="text-sm text-[var(--text-secondary)]">No users found</p>
       ) : (
         <div className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl overflow-hidden">
-
           {/* HEADER */}
           <div className="px-6 py-4 border-b border-[var(--border)]">
             <h2 className="font-semibold text-sm text-[var(--text-primary)]">
@@ -116,7 +115,6 @@ const AdminUsers = () => {
           {/* TABLE */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-
               <thead>
                 <tr className="border-b border-[var(--border)] bg-[var(--bg-secondary)]">
                   {["Name", "Email", "Role", "Status", "Actions"].map((h) => (
@@ -150,12 +148,18 @@ const AdminUsers = () => {
 
                     {/* STATUS */}
                     <td className="px-5 py-3">
-                      {u.isBlocked ? (
-                        <span  aria-label="User is blocked" className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600">
+                      {u.status === "blocked" ? (
+                        <span
+                          aria-label="User is blocked"
+                          className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600"
+                        >
                           Blocked
                         </span>
                       ) : (
-                        <span  aria-label="User is active" className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600">
+                        <span
+                          aria-label="User is active"
+                          className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600"
+                        >
                           Active
                         </span>
                       )}
@@ -163,20 +167,17 @@ const AdminUsers = () => {
 
                     {/* ACTIONS */}
                     <td className="px-5 py-3 flex gap-2">
-
                       {/* BLOCK / UNBLOCK */}
                       <button
                         onClick={() => handleBlockClick(u)}
                         className={`text-xs px-3 py-1.5 rounded-lg text-white font-medium cursor-pointer transition ${
-                          u.isBlocked
+                          u.status === "blocked"
                             ? "bg-green-500 hover:bg-green-600"
                             : "bg-red-500 hover:bg-red-600"
                         }`}
-                        aria-label={`${
-                          u.isBlocked ? "Unblock" : "Block"
-                        } user`}
+                        aria-label={`${u.status === "blocked" ? "Unblock" : "Block"} user`}
                       >
-                        {u.isBlocked ? "Unblock" : "Block"}
+                        {u.status === "blocked" ? "Unblock" : "Block"}
                       </button>
 
                       {/* DELETE */}
@@ -187,13 +188,10 @@ const AdminUsers = () => {
                       >
                         Delete
                       </button>
-
                     </td>
-
                   </tr>
                 ))}
               </tbody>
-
             </table>
           </div>
         </div>
@@ -205,15 +203,15 @@ const AdminUsers = () => {
         title={
           modal.type === "delete"
             ? "Delete User"
-            : modal.user?.isBlocked
-            ? "Unblock User"
-            : "Block User"
+            : modal.user?.status === "blocked"
+              ? "Unblock User"
+              : "Block User"
         }
         message={
           modal.type === "delete"
             ? "This user will be permanently deleted."
             : "Are you sure you want to " +
-              (modal.user?.isBlocked ? "unblock" : "block") +
+              (modal.user?.status === "blocked" ? "unblock" : "block") +
               " this user?"
         }
         confirmText="Yes, Continue"
@@ -221,7 +219,6 @@ const AdminUsers = () => {
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />
-
     </DashboardLayout>
   );
 };
