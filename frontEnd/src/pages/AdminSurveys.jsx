@@ -21,9 +21,10 @@ const AdminSurveys = () => {
         <div className="flex justify-end mb-4">
           <button
             onClick={() => navigate("/AdminDashboard")}
+            aria-label="Back to Dashboard"
             className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
           >
-             <ArrowLeft size={15} /> Back to Dashboard
+             <ArrowLeft size={15} aria-hidden="true" /> Back to Dashboard
           </button>
         </div>
 
@@ -51,6 +52,7 @@ const AdminSurveys = () => {
 
             <button
               onClick={() => navigate(`/admin/surveys/preview/${s._id}`)}
+              aria-label={`Preview survey titled ${s.title}`}
               className="px-4 py-2 rounded-lg bg-[var(--primary)] text-[var(--text-on-primary)] cursor-pointer text-sm"
             >
               Preview

@@ -49,8 +49,9 @@ const SidebarContent = ({ user, navItems, location, onLogout, onClose }) => (
       {/* Logo */}
       <div className="flex items-center cursor-pointer">
         <Link
-          to="/"
+          to={user?.role === "admin" ? "/AdminDashboard" : user?.role === "creator" ? "/CreatorDashboard" : "/Respondent"}
           className="flex items-center text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] rounded-sm"
+          aria-label="Go to dashboard"
         >
           <img
             src={assets.logo}
@@ -63,9 +64,10 @@ const SidebarContent = ({ user, navItems, location, onLogout, onClose }) => (
       {onClose && (
         <button
           onClick={onClose}
-          className="text-[var(--text-secondary)] md:hidden"
+          aria-label="Close Button"
+          className=" p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] cursor-pointer md:hidden"
         >
-          <X size={20} />
+          <X size={20} aria-hidden="true" />
         </button>
       )}
     </div>
@@ -123,8 +125,9 @@ const SidebarContent = ({ user, navItems, location, onLogout, onClose }) => (
         onClick={onLogout}
         className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium
           text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-red-500 transition-all cursor-pointer"
+        aria-label="Log out"
       >
-        <LogOut size={16} />
+        <LogOut size={16} aria-hidden="true" />
         Log Out
       </button>
     </div>
@@ -183,9 +186,10 @@ const DashboardLayout = ({ children, title }) => {
         <header className="flex items-center gap-4 px-6 py-3.5 bg-[var(--bg-primary)] border-b border-[var(--border)] flex-shrink-0">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="md:hidden p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] transition"
+            className="md:hidden p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] cursor-pointer transition"
+            aria-label="Open sidebar"
           >
-            <Menu size={20} />
+            <Menu size={20} aria-hidden="true" />
           </button>
 
           {title && (

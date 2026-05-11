@@ -21,11 +21,14 @@ const Settings = () => {
     root.style.fontSize = `${fontSize}px`;
 
     // Remove old theme classes
-    root.classList.remove('dark', 'high-contrast', 'dyslexia');
+    root.classList.remove('dark', 'high-contrast', 'dyslexia', 'color-blind', 'low-vision', 'soft-contrast');
 
     if (theme === 'dark') root.classList.add('dark');
     if (theme === 'high-contrast') root.classList.add('high-contrast');
     if (theme === 'dyslexia') root.classList.add('dyslexia');
+    if (theme === 'color-blind') root.classList.add('color-blind');
+    if (theme === 'low-vision') root.classList.add('low-vision');
+    if (theme === 'soft-contrast') root.classList.add('soft-contrast');
 
     // Save
     localStorage.setItem('app-settings', JSON.stringify({ fontSize, theme }));
@@ -56,11 +59,15 @@ const Settings = () => {
               { id: 'dark', label: 'Dark Mode' },
               { id: 'high-contrast', label: 'High Contrast' },
               { id: 'dyslexia', label: 'Dyslexia-Friendly' },
+              { id: 'color-blind', label: 'Color Blind' },
+              { id: 'low-vision', label: 'Low Vision' },
+              { id: 'soft-contrast', label: 'Soft Contrast' },
             ].map((t) => (
               <button
                 key={t.id}
+                aria-label={`Switch to ${t.label}`}
                 onClick={() => setTheme(t.id)}
-                className={`p-4 rounded-xl border-2 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]
+                className={`p-4 rounded-xl  cursor-pointer border-2 transition-all focus:outline-none hover:bg-[var(--primary)]/10 focus:ring-2 focus:ring-[var(--focus-ring) ]
                   ${theme === t.id
                     ? 'border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--text-primary)]'
                     : 'border-[var(--border)] text-[var(--text-secondary)]'}`}
@@ -78,13 +85,13 @@ const Settings = () => {
           </h2>
 
           <div className="flex items-center gap-6 bg-[var(--bg-primary)] p-6 rounded-xl border border-[var(--border)]">
-            <button onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="w-12 h-12 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] shadow flex items-center justify-center text-xl font-bold text-[var(--text-primary)] hover:bg-[var(--primary)]/10 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]">-</button>
+            <button aria-label='Decrease Text size' onClick={() => setFontSize(Math.max(12, fontSize - 2))} className="w-12 h-12 rounded-full cursor-pointer bg-[var(--bg-secondary)] border border-[var(--border)] shadow flex items-center justify-center text-xl font-bold text-[var(--text-primary)] hover:bg-[var(--primary)]/10 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]">-</button>
 
             <span className="text-lg font-medium text-[var(--text-primary)]">
               Current Size: {fontSize}px
             </span>
 
-            <button onClick={() => setFontSize(Math.min(24, fontSize + 2))} className="w-12 h-12 rounded-full bg-[var(--bg-secondary)] border border-[var(--border)] shadow flex items-center justify-center text-xl font-bold text-[var(--text-primary)] hover:bg-[var(--primary)]/10 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]">+</button>
+            <button aria-label='Increase Text size' onClick={() => setFontSize(Math.min(24, fontSize + 2))} className="w-12 h-12 rounded-full cursor-pointer bg-[var(--bg-secondary)] border border-[var(--border)] shadow flex items-center justify-center text-xl font-bold text-[var(--text-primary)] hover:bg-[var(--primary)]/10 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]">+</button>
           </div>
 
           <p className="text-sm text-[var(--text-secondary)] mt-2 italic">

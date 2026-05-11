@@ -121,10 +121,10 @@ const AdminDashboard = () => {
 
       {/* ─── STATS ───────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard icon={<Users size={20} />} label="Total Users" value={stats.totalUsers} />
-        <StatCard icon={<CheckCircle size={20} />} label="Active Users" value={stats.activeUsers} />
-        <StatCard icon={<BarChart3 size={20} />} label="Total Surveys" value={stats.totalSurveys} />
-        <StatCard icon={<UserX size={20} />} label="Blocked Users" value={blockedUsers} />
+        <StatCard  aria-label="Total Users" icon={<Users size={20} />} label="Total Users" value={stats.totalUsers} />
+        <StatCard aria-label="Active Users" icon={<CheckCircle size={20} />} label="Active Users" value={stats.activeUsers} />
+        <StatCard aria-label="Total Surveys" icon={<BarChart3 size={20} />} label="Total Surveys" value={stats.totalSurveys} />
+        <StatCard aria-label="Blocked Users" icon={<UserX size={20} />} label="Blocked Users" value={blockedUsers} />
       </div>
 
       {/* ─── CHARTS ───────────────── */}
@@ -138,6 +138,7 @@ const AdminDashboard = () => {
 
           <Doughnut
             key={chartKey}
+            aria-label="User status Distribution chart"
             data={{
               labels: ["Active", "Blocked"],
               datasets: [
@@ -171,6 +172,7 @@ const AdminDashboard = () => {
 
           <Bar
             key={chartKey}
+            aria-label="Survey & Responses"
             data={{
               labels: ["Surveys", "Responses"],
               datasets: [

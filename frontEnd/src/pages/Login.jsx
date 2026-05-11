@@ -110,10 +110,12 @@ const Login = () => {
 
         {/* EMAIL */}
         <div>
-          <label className="text-sm">Email</label>
+          <label className="text-sm" htmlFor="Email">Email</label>
           <div className="relative mt-1">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
             <input
+              id="Email"
+              aria-label="Enter Email"
               className="w-full pl-10 pr-3 py-2 border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-lg focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
               value={form.email}
               onChange={(e) => handleChange("email", e.target.value)}
@@ -125,11 +127,13 @@ const Login = () => {
 
         {/* PASSWORD */}
         <div>
-          <label className="text-sm">Password</label>
+          <label className="text-sm" htmlFor="Password">Password</label>
           <div className="relative mt-1">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
 
             <input
+              id="Password"
+              aria-label="Enter Password"
               type={showPassword ? "text" : "password"}
               className="w-full pl-10 pr-10 py-2 border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-lg focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
               value={form.password}
@@ -139,6 +143,7 @@ const Login = () => {
 
             <button
               type="button"
+              aria-label={showPassword ? "Hide password" : "Show password"}
               onClick={() => setShowPassword((prev) => !prev)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
             >
@@ -152,6 +157,7 @@ const Login = () => {
         <button
           disabled={loading}
           className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-2 rounded-lg flex items-center justify-center gap-2 font-semibold transition"
+          aria-label="Login"
         >
           {loading ? "Logging in..." : "Login"}
           <ArrowRight size={16} />
@@ -167,7 +173,7 @@ const Login = () => {
         {/* REGISTER */}
         <p className="text-center text-sm text-[var(--text-primary)]">
           Don't have an account?{" "}
-          <Link className="text-[var(--primary)] font-semibold" to={redirectPath ? `/register?redirect=${encodeURIComponent(redirectPath)}` : "/register"}>
+          <Link className="text-[var(--primary)] font-semibold" to={redirectPath ? `/register?redirect=${encodeURIComponent(redirectPath)}` : "/register"} aria-label="Go to registration page">
             Register
           </Link>
         </p>    

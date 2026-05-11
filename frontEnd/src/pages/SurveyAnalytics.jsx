@@ -94,9 +94,10 @@ const SurveyAnalytics = () => {
         {/* Back */}
         <button
           onClick={() => navigate("/CreatorDashboard")}
+          aria-label="Back to Dashboard"
           className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
         >
-          <ArrowLeft size={15} /> Back to Dashboard
+          <ArrowLeft size={15} aria-hidden="true" /> Back to Dashboard
         </button>
 
         {/* Header card */}
@@ -113,18 +114,20 @@ const SurveyAnalytics = () => {
             </div>
             <div className="flex gap-2">
               <button
+                aria-label="Export as CSV"
                 onClick={exportCSV}
                 className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium text-[var(--text-on-primary)] cursor-pointer transition"
                 style={{ background: "var(--primary)" }}
               >
-                <Download size={14} /> CSV
+                <Download size={14} aria-hidden="true" /> CSV
               </button>
               <button
+                aria-label="Export as PDF"
                 onClick={exportPDF}
                 className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg font-medium text-[var(--text-on-primary)] cursor-pointer transition"
                 style={{ background: "var(--accent, #8b5cf6)" }}
               >
-                <Download size={14} /> PDF
+                <Download size={14} aria-hidden="true" /> PDF
               </button>
             </div>
           </div>

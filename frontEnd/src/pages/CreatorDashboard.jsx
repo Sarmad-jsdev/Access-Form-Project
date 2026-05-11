@@ -81,7 +81,7 @@ const CreatorDashboard = () => {
 
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <StatCard label="Total Surveys" value={stats.totalSurveys} icon={FileText} accent="var(--primary)" />
+        <StatCard label="Total Surveys" value={stats.totalSurveys} icon={FileText} accent="#3b82f6" />
         <StatCard label="Active Surveys" value={stats.activeSurveys} icon={Activity} accent="#22c55e" />
         <StatCard label="Total Responses" value={stats.totalResponses} icon={TrendingUp} accent="#f59e0b" />
       </div>
@@ -91,10 +91,11 @@ const CreatorDashboard = () => {
         <h2 className="text-base font-semibold text-[var(--text-primary)]">Your Surveys</h2>
         <Link
           to="/CreateForm"
+          aria-label="Create new survey"
           className="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg text-[var(--text-on-primary)] cursor-pointer transition"
           style={{ background: "var(--primary)" }}
         >
-          <PlusCircle size={15} /> New Survey
+          <PlusCircle size={15} aria-hidden="true" /> New Survey
         </Link>
       </div>
 
@@ -129,6 +130,7 @@ const CreatorDashboard = () => {
               </div>
               {/* Status badge */}
               <span
+                aria-label={survey.isActive ? "Survey is active" : "Survey is inactive"}
                 className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
                   survey.isActive
                     ? "bg-[var(--status-active-bg)] text-[var(--status-active-text)]"
@@ -142,7 +144,8 @@ const CreatorDashboard = () => {
             {/* Toggle active button */}
             <button
               onClick={() => toggleStatus(survey._id)}
-              className="text-xs text-[var(--text-secondary)] underline underline-offset-2 text-left w-fit cursor-pointer"
+              aria-label={survey.isActive ? "Deactivate survey" : "Activate survey"}
+              className="text-xs text-[var(--text-secondary)] bg-[var(--bg-secondary)] p-2 rounded-sm underline underline-offset-2 text-left w-fit cursor-pointer hover:bg-[var(--primary)]/10 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
             >
               {survey.isActive ? "Deactivate" : "Activate"}
             </button>
@@ -151,31 +154,35 @@ const CreatorDashboard = () => {
             <div className="flex flex-wrap gap-2 pt-1 border-t border-[var(--border)]">
               <Link
                 to={`/preview/${survey._id}`}
-                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer"
+                aria-label="Preview survey"
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer hover:bg-[var(--primary)]/10 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
                 style={{ background: "var(--btn-preview, #3b82f6)", color: "#fff" }}
               >
-                <Eye size={12} /> Preview
+                <Eye size={12} aria-hidden="true" /> Preview
               </Link>
               <Link
                 to={`/creator/analytics/${survey._id}`}
-                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer"
+                aria-label="View survey analytics"
+                className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer hover:bg-[var(--primary)]/10 focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)]"
                 style={{ background: "var(--btn-analytics, #8b5cf6)", color: "#fff" }}
               >
-                <BarChart size={12} /> Analytics
+                <BarChart size={12} aria-hidden="true" /> Analytics
               </Link>
               <button
                 onClick={() => handleCopyLink(survey._id)}
+                  aria-label="Copy survey link"
                 className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer"
                 style={{ background: "var(--btn-success, #22c55e)", color: "#fff" }}
               >
-                <Copy size={12} /> Copy Link
+                <Copy size={12} aria-hidden="true" /> Copy Link
               </button>
               <button
                 onClick={() => handleDelete(survey._id)}
+                aria-label="Delete survey"
                 className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg font-medium cursor-pointer"
                 style={{ background: "var(--btn-warning, #ef4444)", color: "#fff" }}
               >
-                <Trash2 size={12} /> Delete
+                <Trash2 size={12} aria-hidden="true" /> Delete
               </button>
             </div>
           </div>

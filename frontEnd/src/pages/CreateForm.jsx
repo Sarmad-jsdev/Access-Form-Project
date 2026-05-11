@@ -113,9 +113,10 @@ const CreateForm = () => {
       <div className="flex justify-end mb-4">
         <button
           onClick={() => navigate("/CreatorDashboard")}
+          aria-label="Back to Dashboard"
           className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
         >
-          <ArrowLeft size={15} /> Back to Dashboard
+          <ArrowLeft aria-hidden="true" size={15} /> Back to Dashboard
         </button>
       </div>
 
@@ -139,6 +140,9 @@ const CreateForm = () => {
           <div>
             <input
               value={title}
+              name="text"
+              type="text"
+              aria-label="Enter Title"
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Survey title"
               className="w-full p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
@@ -150,6 +154,8 @@ const CreateForm = () => {
           <div>
             <textarea
               value={description}
+              name="text"
+              aria-label="Enter Description"
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Survey description"
               rows={3}
@@ -173,6 +179,7 @@ const CreateForm = () => {
               </span>
               <button
                 onClick={() => deleteQuestion(index)}
+                aria-label="Delete question"
                 className="text-[var(--btn-warning)] cursor-pointer"
               >
                 <Trash2 size={15} />
@@ -181,6 +188,8 @@ const CreateForm = () => {
 
             <input
               value={q.questionText}
+              name="text"              type="text"
+              aria-label="Enter Question Text"
               onChange={(e) =>
                 handleQuestionChange(index, "questionText", e.target.value)
               }
@@ -193,18 +202,20 @@ const CreateForm = () => {
 
             <select
               value={q.questionType}
+              name="questionType"
+              aria-label="Select question type"
               onChange={(e) =>
                 handleQuestionChange(index, "questionType", e.target.value)
               }
               className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm cursor-pointer"
             >
-              <option value="text">Text</option>
-              <option value="textarea">Textarea</option>
-              <option value="email">Email</option>
-              <option value="number">Number</option>
-              <option value="radio">Radio</option>
-              <option value="dropdown">Dropdown</option>
-              <option value="rating">Rating</option>
+              <option  aria-label="Text" value="text">Text</option>
+              <option aria-label="Textarea" value="textarea">Textarea</option>
+              <option aria-label="Email" value="email">Email</option>
+              <option aria-label="Number" value="number">Number</option>
+              <option aria-label="Radio" value="radio">Radio</option>
+              <option aria-label="Dropdown" value="dropdown">Dropdown</option>
+              <option aria-label="Rating" value="rating">Rating</option>
             </select>
 
             {q.questionType === "rating" && (
@@ -219,6 +230,8 @@ const CreateForm = () => {
                     <input
                       key={i}
                       value={opt}
+                      name={`option_${i}`}
+                      aria-label={`Enter option ${i + 1}`}
                       onChange={(e) =>
                         handleOptionChange(index, i, e.target.value)
                       }
@@ -234,6 +247,7 @@ const CreateForm = () => {
                   <button
                     onClick={() => addOption(index)}
                     className="text-xs font-medium mt-1"
+                    aria-label="Add option"
                     style={{
                       color: "var(--primary)",
                       background: "var(--bg-secondary)",
@@ -258,6 +272,7 @@ const CreateForm = () => {
           <button
             onClick={addQuestion}
             className="px-4 py-2.5 rounded-xl text-sm font-medium border border-[var(--border)] text-[var(--text-primary)] bg-[var(--bg-primary)] hover:bg-[var(--bg-secondary)] transition cursor-pointer"
+            aria-label="Add question"
           >
             + Add Question
           </button>
@@ -266,6 +281,7 @@ const CreateForm = () => {
             disabled={loading}
             className="px-5 py-2.5 rounded-xl text-sm font-medium text-[var(--text-on-primary)] cursor-pointer disabled:opacity-50 transition"
             style={{ background: "var(--primary)" }}
+            aria-label="Save survey"
           >
             {loading ? "Saving…" : "Save Survey"}
           </button>

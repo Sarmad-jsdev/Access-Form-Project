@@ -175,16 +175,18 @@ const Register = () => {
           <form onSubmit={handleRegister} className="space-y-5">
             {/* NAME */}
             <div>
-              <label className="text-xs font-bold text-[var(--text-primary)]">
+              <label className="text-xs font-bold text-[var(--text-primary)]" htmlFor="name">
                 Full Name
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
                 <input
+                  id="name"
                   value={formData.name}
                   onChange={(e) => handleChange("name", e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-xl focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
                   placeholder="Enter your name"
+                  aria-label="Full Name"
                 />
               </div>
               <FieldError message={errors.name} />
@@ -192,16 +194,18 @@ const Register = () => {
 
             {/* EMAIL */}
             <div>
-              <label className="text-xs font-bold text-[var(--text-primary)]">
+              <label className="text-xs font-bold text-[var(--text-primary)]" htmlFor="email">
                 Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
                 <input
+                  id="email"
                   value={formData.email}
                   onChange={(e) => handleChange("email", e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-xl focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
                   placeholder="Enter your email"
+                  aria-label="Email"
                 />
               </div>
               <FieldError message={errors.email} />
@@ -209,13 +213,15 @@ const Register = () => {
 
             {/* ROLE */}
             <div>
-              <label className="text-xs font-bold text-[var(--text-primary)]">
+              <label className="text-xs font-bold text-[var(--text-primary)]" htmlFor="role">
                 Role
               </label>
               <select
+                id="role"
                 value={formData.role}
                 onChange={(e) => handleChange("role", e.target.value)}
                 className="w-full p-2.5 border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-xl"
+                aria-label="Role" 
               >
                 <option value="respondent">Respondent</option>
                 <option value="creator">Form Creator</option>
@@ -224,22 +230,25 @@ const Register = () => {
 
             {/* PASSWORD */}
             <div>
-              <label className="text-xs font-bold text-[var(--text-primary)]">
+              <label className="text-xs font-bold text-[var(--text-primary)]" htmlFor="password">
                 Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   placeholder="Enter your password"
                   onChange={(e) => handleChange("password", e.target.value)}
                   className="w-full pl-10 pr-10 py-2.5 border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-xl focus:ring-2 focus:ring-[var(--focus-ring)] outline-none"
+                  aria-label="Password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -249,12 +258,13 @@ const Register = () => {
 
             {/* CONFIRM PASSWORD */}
             <div>
-              <label className="text-xs font-bold text-[var(--text-primary)]">
+              <label className="text-xs font-bold text-[var(--text-primary)]" htmlFor="confirmPassword">
                 Confirm Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
                 <input
+                  id="confirmPassword"
                   type={showPassword ? "text" : "password"}
                   value={formData.confirmPassword}
                   placeholder="Confirm Password"
@@ -262,11 +272,13 @@ const Register = () => {
                     handleChange("confirmPassword", e.target.value)
                   }
                   className="w-full pl-10 pr-10 py-2.5 border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-xl"
+                  aria-label="Confirm Password"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -277,6 +289,7 @@ const Register = () => {
             {/* BUTTON */}
             <button
               type="submit"
+              aria-label="Sign Up"
               disabled={loading}
               className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition"
             >
@@ -290,6 +303,7 @@ const Register = () => {
             <Link
               to={`/login?redirect=${redirectPath}`}
               className="text-[var(--primary)] font-semibold hover:underline"
+              aria-label="Go to login page"
             >
               Login here
             </Link>

@@ -24,8 +24,9 @@ const SurveyPreview = () => {
           <button
             onClick={() => navigate("/AdminDashboard")}
             className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
+            aria-label="Back to Dashboard"
           >
-             <ArrowLeft size={15} /> Back to Dashboard
+             <ArrowLeft size={15} aria-hidden="true" /> Back to Dashboard
           </button>
         </div>
 

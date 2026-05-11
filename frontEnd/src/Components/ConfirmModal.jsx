@@ -45,6 +45,7 @@ const ConfirmModal = ({
 
           <button
             onClick={onCancel}
+              aria-label="Cancel action"
             className="px-4 py-2 rounded-lg text-sm border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]"
           >
             {cancelText}
@@ -52,6 +53,7 @@ const ConfirmModal = ({
 
           <button
             onClick={onConfirm}
+            aria-label="Confirm action"
             className={`px-4 py-2 rounded-lg text-sm text-[var(--text-on-primary)] cursor-pointer  transition ${styles[type]}`}
           >
             {confirmText}

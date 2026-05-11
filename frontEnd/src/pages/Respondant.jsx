@@ -142,6 +142,7 @@ const Respondent = () => {
                         setSelectedSurvey(survey);
                         setMessage("");
                       }}
+                      aria-label={`Start survey titled ${survey.title}`}
                       className="mt-4 px-4 py-2 rounded-lg text-sm font-medium text-[var(--text-on-primary)] cursor-pointer transition"
                       style={{ background: "var(--primary)" }}
                     >
@@ -162,6 +163,7 @@ const Respondent = () => {
     <DashboardLayout title={selectedSurvey.title}>
       <div className="max-w-2xl">
         <button
+          aria-label="Back to surveys"
           onClick={() => {
             setSelectedSurvey(null);
             setAnswers({});
@@ -169,7 +171,7 @@ const Respondent = () => {
           }}
           className="px-4 py-2 my-4 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
         >
-          <ArrowLeft size={15} /> Back to surveys
+          <ArrowLeft size={15} aria-hidden="true" /> Back to surveys
         </button>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -190,6 +192,8 @@ const Respondent = () => {
               {["text", "email", "number"].includes(q.questionType) && (
                 <input
                   type={q.questionType}
+                  aria-label={`Enter ${q.questionType} details`}
+                  name="Enter Details"
                   className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
                   onChange={(e) => handleChange(q, e.target.value)}
@@ -200,6 +204,8 @@ const Respondent = () => {
               {q.questionType === "textarea" && (
                 <textarea
                   rows={4}
+                  aria-label="Enter detailed response"
+                  name="Enter Details"
                   className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
                   onChange={(e) => handleChange(q, e.target.value)}
@@ -213,6 +219,7 @@ const Respondent = () => {
                     <button
                       type="button"
                       key={num}
+                      aria-label={`Select rating ${num}`}
                       onClick={() => handleChange(q, num)}
                       className={`w-10 h-10 rounded-lg border text-sm cursor-pointer transition ${
                         answers[q._id] === num
@@ -237,6 +244,7 @@ const Respondent = () => {
                       name={q._id}
                       checked={answers[q._id] === opt}
                       onChange={() => handleChange(q, opt)}
+                      aria-label={`Select option ${opt}`}
                     />
                     {opt}
                   </label>
@@ -244,6 +252,8 @@ const Respondent = () => {
 
               {q.questionType === "dropdown" && (
                 <select
+                  aria-label="Select an option"
+                    name="Select Option"  
                   className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
                   onChange={(e) => handleChange(q, e.target.value)}
@@ -261,6 +271,7 @@ const Respondent = () => {
 
           <button
             disabled={submitting}
+            aria-label="Submit survey"
             className="px-6 py-2.5 rounded-lg text-sm font-medium text-[var(--text-on-primary)] cursor-pointer disabled:opacity-50 transition"
             style={{ background: "var(--primary)" }}
           >

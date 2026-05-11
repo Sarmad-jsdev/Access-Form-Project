@@ -10,6 +10,10 @@
               color 0.3s ease,
              border-color 0.3s ease;
   font-family: 'Manrope', sans-serif;
+  focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
 }
 
 html {
@@ -127,4 +131,97 @@ html {
   --focus-ring: #5F7A61;
   --text-on-primary: #FFFFFF;
   --font-family: var(--font-dyslexia);
+}
+
+/* ==============================
+   COLOR BLIND FRIENDLY THEME
+   ============================== */
+.color-blind {
+  --bg-primary: #F4F7FB;
+  --bg-secondary: #FFFFFF;
+
+  --text-primary: #1B1B1B;
+  --text-secondary: #374151;
+
+  /* Blue + Orange combination works better */
+  --primary: #005FCC;
+  --primary-dark: #0047A3;
+
+  --accent: #FF8C42;
+
+  --border: #C7D2E0;
+  --border-color: #1B1B1B;
+
+  --focus-ring: #FF8C42;
+  --text-on-primary: #FFFFFF;
+
+  --btn-preview: #005FCC;
+  --btn-edit: #FF8C42;
+  --btn-analytics: #6B46C1;
+  --btn-success: #00875A;
+  --btn-warning: #D97706;
+
+  --status-active-bg: #D9FBE8;
+  --status-active-text: #065F46;
+
+  --status-inactive-bg: #FDE2E2;
+  --status-inactive-text: #991B1B;
+}
+
+
+/* ==============================
+   LOW VISION THEME
+   ============================== */
+.low-vision {
+  --bg-primary: #111827;
+  --bg-secondary: #1F2937;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #E5E7EB;
+
+  --primary: #FACC15;
+  --primary-dark: #EAB308;
+
+  --accent: #38BDF8;
+
+  --border: #FACC15;
+  --border-color: #FFFFFF;
+
+  --focus-ring: #38BDF8;
+  --text-on-primary: #000000;
+
+  --status-active-bg: #14532D;
+  --status-active-text: #BBF7D0;
+
+  --status-inactive-bg: #7F1D1D;
+  --status-inactive-text: #FECACA;
+}
+
+
+/* ==============================
+   SOFT CONTRAST THEME
+   ============================== */
+.soft-contrast {
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+
+  --text-primary: #334155;
+  --text-secondary: #64748B;
+
+  --primary: #2563EB;
+  --primary-dark: #1D4ED8;
+
+  --accent: #9333EA;
+
+  --border: #CBD5E1;
+  --border-color: #475569;
+
+  --focus-ring: #60A5FA;
+  --text-on-primary: #FFFFFF;
+
+  --status-active-bg: #DCFCE7;
+  --status-active-text: #166534;
+
+  --status-inactive-bg: #FEE2E2;
+  --status-inactive-text: #991B1B;
 }

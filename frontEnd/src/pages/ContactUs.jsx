@@ -47,7 +47,7 @@ const ContactUs = () => {
 
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
-                  <Mail className="text-[var(--text-on-primary)]" />
+                  <Mail aria-hidden="true" className="text-[var(--text-on-primary)]" />
                   <p>
                     <a
                       href="mailto:support@accessform.edu"
@@ -129,6 +129,7 @@ const ContactUs = () => {
                 <textarea
                   id="message"
                   aria-required="true"
+                  aria-label="Enter Message"
                   rows="4"
                   required
                   placeholder="Write your message here..."
@@ -140,6 +141,7 @@ const ContactUs = () => {
               <div className="md:col-span-2">
                 <button
                   type="submit"
+                  aria-label="Send Message"
                   className="w-full md:w-auto bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] px-10 py-4 rounded-lg font-bold transition-all shadow-lg active:scale-95 focus:outline-none focus:ring-4 focus:ring-[var(--focus-ring)]"
                 >
                   Send Message

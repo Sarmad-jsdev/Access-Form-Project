@@ -29,7 +29,11 @@ const PreviewSurvey = () => {
   if (!survey) {
     return (
       <DashboardLayout title="Preview Survey">
-        <p className="text-[var(--text-secondary)] text-sm" role="status" aria-live="polite">
+        <p
+          className="text-[var(--text-secondary)] text-sm"
+          role="status"
+          aria-live="polite"
+        >
           Loading survey…
         </p>
       </DashboardLayout>
@@ -38,22 +42,20 @@ const PreviewSurvey = () => {
 
   return (
     <DashboardLayout title="Preview Survey">
-
       {/* Back button */}
       <div className="flex justify-end mb-4">
-          <button
-            onClick={() => navigate("/CreatorDashboard")}
-            className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
-          >
-             <ArrowLeft size={15} /> Back to Dashboard
-          </button>
-        </div>
+        <button
+          onClick={() => navigate("/CreatorDashboard")}
+          aria-label="Back to Dashboard"
+          className="px-4 py-2 rounded-lg bg-[var(--primary)] flex items-center text-[var(--text-on-primary)] cursor-pointer text-sm"
+        >
+          <ArrowLeft size={15} aria-hidden="true" /> Back to Dashboard
+        </button>
+      </div>
 
-        {/* Main content */}
+      {/* Main content */}
 
       <div className="max-w-2xl space-y-5">
-
-
         {/* Survey header card */}
         <div className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-6">
           <h1
@@ -64,54 +66,117 @@ const PreviewSurvey = () => {
           >
             {survey.title}
           </h1>
-          <p className="text-sm text-[var(--text-secondary)] mt-2">{survey.description}</p>
+          <p className="text-sm text-[var(--text-secondary)] mt-2">
+            {survey.description}
+          </p>
         </div>
 
-        {/* Questions (read-only) */}
+        {/* Questions (read-only preview) */}
         {survey.questions?.length > 0 ? (
           survey.questions.map((q, i) => (
-            <div key={i} className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5">
+            <div
+              key={i}
+              className="bg-[var(--bg-primary)] border border-[var(--border)] rounded-2xl p-5"
+            >
+              {/* Question Title */}
+              <label
+                htmlFor={`question-${i}`}
+                className="block font-semibold text-sm text-[var(--text-primary)] mb-3"
+              >
+                {i + 1}. {q.questionText}
+              </label>
 
-              {(q.questionType === "radio" || q.questionType === "checkbox") ? (
-                <fieldset className="border-none p-0 m-0">
-                  <legend className="font-semibold text-sm text-[var(--text-primary)] mb-3">
-                    {i + 1}. {q.questionText}
-                  </legend>
+              {/* TEXT / EMAIL / DATE */}
+              {(q.questionType === "text" ||
+                q.questionType === "email" ||
+                q.questionType === "date") && (
+                <input
+                  id={`question-${i}`}
+                  type={q.questionType}
+                  aria-label={q.questionText}
+                  disabled
+                  placeholder={`Enter ${q.questionType}`}
+                  className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
+                />
+              )}
+
+              {/* TEXTAREA */}
+              {q.questionType === "textarea" && (
+                <textarea
+                  id={`question-${i}`}
+                  disabled
+                  rows={4}
+                  aria-label={`Textarea for question ${i + 1}`}
+                  placeholder="Write your answer..."
+                  className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm resize-none"
+                />
+              )}
+
+              {/* DROPDOWN */}
+              {q.questionType === "dropdown" && (
+                <select
+                  id={`question-${i}`}
+                  disabled
+                  aria-label={`Dropdown for question ${i + 1}`}
+                  className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
+                >
+                  <option>Select option</option>
+
+                  {q.options?.map((opt, j) => (
+                    <option key={j}>{opt}</option>
+                  ))}
+                </select>
+              )}
+
+              {/* RADIO */}
+              {q.questionType === "radio" && (
+                <fieldset className="space-y-2">
+                  <legend className="sr-only">{q.questionText}</legend>
+
                   {q.options?.map((opt, index) => (
-                    <label key={index} className="flex items-center gap-2 mb-2 text-sm text-[var(--text-primary)]">
-                      <input type={q.questionType} disabled className="accent-[var(--primary)]" />
+                    <label
+                      key={index}
+                      className="flex items-center gap-2 text-sm text-[var(--text-primary)]"
+                      aria-label={opt}
+                    >
+                      <input
+                        type="radio"
+                        disabled
+                        name={`question-${i}`}
+                        className="accent-[var(--primary)]"
+                      />
                       {opt}
                     </label>
                   ))}
                 </fieldset>
-              ) : q.questionType === "dropdown" ? (
-                <div>
-                  <label className="block font-semibold text-sm text-[var(--text-primary)] mb-2">
-                    {i + 1}. {q.questionText}
-                  </label>
-                  <select
-                    disabled
-                    className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
-                  >
-                    {q.options?.map((opt, j) => <option key={j}>{opt}</option>)}
-                  </select>
-                </div>
-              ) : (
-                <div>
-                  <label className="block font-semibold text-sm text-[var(--text-primary)] mb-2">
-                    {i + 1}. {q.questionText}
-                  </label>
-                  <input
-                    type={q.questionType}
-                    disabled
-                    className="w-full p-2.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-primary)] text-sm"
-                  />
+              )}
+
+              {/* RATING */}
+              {q.questionType === "rating" && (
+                <div
+                  className="flex items-center gap-2"
+                  role="radiogroup"
+                  aria-label={`Rating question ${i + 1}`}
+                >
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      disabled
+                      aria-label={`Rate ${num} out of 5`}
+                      className="w-10 h-10 rounded-full border border-[var(--border)] bg-[var(--bg-secondary)] text-sm text-[var(--text-primary)]"
+                    >
+                      {num}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
           ))
         ) : (
-          <p className="text-sm text-[var(--text-secondary)]">No questions found.</p>
+          <p className="text-sm text-[var(--text-secondary)]">
+            No questions found.
+          </p>
         )}
       </div>
     </DashboardLayout>

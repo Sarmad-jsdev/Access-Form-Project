@@ -151,11 +151,11 @@ const AdminUsers = () => {
                     {/* STATUS */}
                     <td className="px-5 py-3">
                       {u.isBlocked ? (
-                        <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600">
+                        <span  aria-label="User is blocked" className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600">
                           Blocked
                         </span>
                       ) : (
-                        <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600">
+                        <span  aria-label="User is active" className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-600">
                           Active
                         </span>
                       )}
@@ -172,6 +172,9 @@ const AdminUsers = () => {
                             ? "bg-green-500 hover:bg-green-600"
                             : "bg-red-500 hover:bg-red-600"
                         }`}
+                        aria-label={`${
+                          u.isBlocked ? "Unblock" : "Block"
+                        } user`}
                       >
                         {u.isBlocked ? "Unblock" : "Block"}
                       </button>
@@ -180,6 +183,7 @@ const AdminUsers = () => {
                       <button
                         onClick={() => handleDeleteClick(u)}
                         className="text-xs px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-black text-white font-medium cursor-pointer transition"
+                        aria-label="Delete user"
                       >
                         Delete
                       </button>

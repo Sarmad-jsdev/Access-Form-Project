@@ -187,6 +187,7 @@ const SurveyPage = () => {
               {["text", "email", "number"].includes(q.questionType) && (
                 <input
                   type={q.questionType}
+                  aria-label={`Answer for question: ${q.questionText}`}
                   className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
                   onChange={(e) => handleChange(q, e.target.value)}
@@ -197,6 +198,7 @@ const SurveyPage = () => {
               {q.questionType === "textarea" && (
                 <textarea
                   rows={4}
+                  aria-label={`Textarea for question: ${q.questionText}`}
                   className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
                   onChange={(e) => handleChange(q, e.target.value)}
@@ -211,6 +213,7 @@ const SurveyPage = () => {
                       type="button"
                       key={num}
                       onClick={() => handleChange(q, num)}
+                      aria-label={`Rate ${num} out of 5`}
                       className={`w-10 h-10 rounded-lg border text-sm cursor-pointer transition ${
                         answers[q._id] === num
                           ? "bg-[var(--primary)] text-[var(--text-on-primary)]"
@@ -234,6 +237,7 @@ const SurveyPage = () => {
                       type="radio"
                       name={q._id}
                       checked={answers[q._id] === opt}
+                      aria-label={opt}
                       onChange={() => handleChange(q, opt)}
                     />
                     {opt}
@@ -245,6 +249,7 @@ const SurveyPage = () => {
                 <select
                   className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm"
                   value={answers[q._id] || ""}
+                  aria-label={`Dropdown for question: ${q.questionText}`}
                   onChange={(e) => handleChange(q, e.target.value)}
                 >
                   <option value="">Select</option>
@@ -261,6 +266,7 @@ const SurveyPage = () => {
           {/* SUBMIT */}
           <button
             disabled={submitting}
+            aria-label="Submit Survey"
             className="px-6 py-2.5 rounded-lg text-sm font-medium text-[var(--text-on-primary)] cursor-pointer disabled:opacity-50 transition"
             style={{ background: "var(--primary)" }}
           >
