@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import FieldError from "../Components/InlineError";
+import { getDashboardRoute } from "../utilis/DashboardRoute";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
@@ -70,9 +71,9 @@ const Login = () => {
           return;
         }
 
-        if (user.role === "admin") navigate("/AdminDashboard");
-        else if (user.role === "creator") navigate("/CreatorDashboard");
-        else navigate("/Respondent");
+        // Fallback to role-based dashboard
+        const dashboardRoute = getDashboardRoute(user.role);
+        navigate(dashboardRoute, { replace: true });
       }, 1200);
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");

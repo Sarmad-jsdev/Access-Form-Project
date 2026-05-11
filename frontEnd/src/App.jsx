@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import Aboutus from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import Settings from "./pages/settings";
+import PublicRoute from "./context/PublicRoute";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -59,9 +60,11 @@ const App = () => {
           <Route
             path="/"
             element={
+              <PublicRoute>
               <PublicLayout>
                 <Home />
               </PublicLayout>
+              </PublicRoute>
             }
           />
 
@@ -69,9 +72,11 @@ const App = () => {
             path="/about"
             element={
               <>
-                <PublicLayout>
-                  <Aboutus />
-                </PublicLayout>
+                <PublicRoute>
+                  <PublicLayout>
+                    <Aboutus />
+                  </PublicLayout>
+                </PublicRoute>
               </>
             }
           />
@@ -80,9 +85,11 @@ const App = () => {
             path="/contact"
             element={
               <>
-                <PublicLayout>
-                  <ContactUs />
-                </PublicLayout>
+                <PublicRoute>
+                  <PublicLayout>
+                    <ContactUs />
+                  </PublicLayout>
+                </PublicRoute>
               </>
             }
           />
@@ -91,9 +98,11 @@ const App = () => {
             path="/settings"
             element={
               <>
+              <PublicRoute>
                 <PublicLayout>
                   <Settings />
                 </PublicLayout>
+               </PublicRoute> 
               </>
             }
           />
@@ -102,9 +111,11 @@ const App = () => {
             path="/login"
             element={
               <>
-                <PublicLayout>
-                  <Login />
-                </PublicLayout>
+                <PublicRoute>
+                  <PublicLayout>
+                    <Login />
+                  </PublicLayout>
+                </PublicRoute>
               </>
             }
           />
@@ -113,9 +124,11 @@ const App = () => {
             path="/register"
             element={
               <>
-                <PublicLayout>
-                  <Register />
-                </PublicLayout>
+                <PublicRoute>
+                  <PublicLayout>
+                    <Register />
+                  </PublicLayout>
+                </PublicRoute>
               </>
             }
           />
