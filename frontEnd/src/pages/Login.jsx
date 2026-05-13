@@ -157,7 +157,7 @@ const Login = () => {
         {/* BUTTON */}
         <button
           disabled={loading}
-          className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-2 rounded-lg flex items-center justify-center gap-2 font-semibold transition"
+          className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-2 rounded-lg flex items-center justify-center gap-2 font-semibold cursor-pointer transition"
           aria-label="Login"
         >
           {loading ? "Logging in..." : "Login"}

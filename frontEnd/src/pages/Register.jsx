@@ -291,7 +291,7 @@ const Register = () => {
               type="submit"
               aria-label="Sign Up"
               disabled={loading}
-              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition"
+              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-on-primary)] py-3 rounded-xl cursor-pointer font-semibold flex items-center justify-center gap-2 shadow-lg active:scale-95 transition"
             >
               {loading ? "Creating..." : "Sign Up"}
               <ArrowRight size={16} />
