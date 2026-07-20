@@ -67,7 +67,7 @@ const Navbar = () => {
           {/* MOBILE BUTTON */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2"
+            className="md:hidden p-2 cursor-pointer rounded-lg hover:bg-[var(--bg-secondary)] transition-all"
           >
             <img
               src={isOpen ? assets.cross : assets.menu}

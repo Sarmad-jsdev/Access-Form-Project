@@ -3,7 +3,7 @@ import axiosInstance from "../axiosConfig";
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -43,6 +43,8 @@ export const AuthProvider = ({ children }) => {
       password,
     });
 
+
+
     localStorage.setItem("token", res.data.token);
     setUser(res.data.user);
 
@@ -70,3 +72,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+
