@@ -19,9 +19,9 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
 
           {/* LOGO */}
-          <Link to="/" className="flex items-center gap-2">
-            <img src={assets.logo} className="h-10" />
-            <span className="font-bold text-[var(--text-primary)]">
+          <Link to="/" className="flex items-center gap-2"  >
+            <img src={assets.logo} className="h-10" aria-label="AccessForm Logo"/>
+            <span className="font-bold text-[var(--text-primary)]" aria-label="AccessForm">
               AccessForm
             </span>
           </Link>
@@ -42,6 +42,7 @@ const Navbar = () => {
                       : "text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]"
                   }
                 `}
+                aria-label={item.name}
               >
                 {item.name}
               </NavLink>
@@ -52,12 +53,14 @@ const Navbar = () => {
               <Link
                 to="/login"
                 className="px-4 py-2 text-sm rounded-lg bg-[var(--primary)] text-[var(--text-on-primary)]"
+                aria-label="Login button"
               >
                 Login
               </Link>
               <Link
                 to="/register"
                 className="px-4 py-2 text-sm rounded-lg border border-[var(--primary)] text-[var(--primary)]"
+                aria-label="Register button"
               >
                 Register
               </Link>
@@ -72,6 +75,7 @@ const Navbar = () => {
             <img
               src={isOpen ? assets.cross : assets.menu}
               className="h-5 w-5 invert-[.5]"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
             />
           </button>
         </div>
@@ -93,16 +97,17 @@ const Navbar = () => {
                       : "text-[var(--text-secondary)]"
                   }
                 `}
+                aria-label={item.name}
               >
                 {item.name}
               </NavLink>
             ))}
 
             <div className="flex flex-col gap-2 pt-3">
-              <Link to="/login" className="px-4 py-2 rounded-lg bg-[var(--primary)] text-[var(--text-on-primary)] text-center">
+              <Link to="/login" className="px-4 py-2 rounded-lg bg-[var(--primary)] text-[var(--text-on-primary)] text-center" aria-label="Login button">
                 Login
               </Link>
-              <Link to="/register" className="px-4 py-2 rounded-lg border border-[var(--primary)] text-[var(--primary)] text-center">
+              <Link to="/register" className="px-4 py-2 rounded-lg border border-[var(--primary)] text-[var(--primary)] text-center" aria-label="Register button">
                 Register
               </Link>
             </div>
