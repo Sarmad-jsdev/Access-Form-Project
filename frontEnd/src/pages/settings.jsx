@@ -65,7 +65,6 @@ const Settings = () => {
             ].map((t) => (
               <button
                 key={t.id}
-                aria-label={`Switch to ${t.label}`}
                 onClick={() => setTheme(t.id)}
                 className={`p-4 rounded-xl  cursor-pointer border-2 transition-all focus:outline-none hover:bg-[var(--primary)]/10 focus:ring-2 focus:ring-[var(--focus-ring) ]
                   ${theme === t.id
