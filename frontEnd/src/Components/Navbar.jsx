@@ -71,6 +71,7 @@ const Navbar = () => {
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 cursor-pointer rounded-lg hover:bg-[var(--bg-secondary)] transition-all"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
           >
             <img
               src={isOpen ? assets.cross : assets.menu}
